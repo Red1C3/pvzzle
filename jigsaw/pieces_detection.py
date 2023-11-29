@@ -18,10 +18,7 @@ def extract_pieces(img):
     pieces=[]
     for mask,contour in zip(masks,contours):
         piece=cv2.bitwise_and(img,img,mask=mask)
-        left_most=tuple(contour[contour[:,:,0].argmin()][0])
-        right_most=tuple(contour[contour[:,:,0].argmax()][0])
-        top_most=tuple(contour[contour[:,:,1].argmin()][0])
-        bottom_most=tuple(contour[contour[:,:,1].argmax()][0])
-        piece=piece[left_most[0]:right_most[0],top_most[1]:bottom_most[1]]
+        x,y,w,h=cv2.boundingRect(contour)
+        piece=piece[y:y+h,x:x+w]
         pieces.append(piece)
     return pieces
