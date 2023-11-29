@@ -7,7 +7,7 @@ from utils import img_utils
 def extract_pieces(img):
     img_blur=cv2.GaussianBlur(img,(5,5),None)
     img_gray=cv2.cvtColor(img_blur,cv2.COLOR_BGR2GRAY)
-    _,img_bin=cv2.threshold(img_gray,5,255,cv2.THRESH_BINARY)
+    _,img_bin=cv2.threshold(img_gray,20,255,cv2.THRESH_BINARY)
     img_bin=cv2.GaussianBlur(img_bin,(5,5),None)
     contours,hiarachy=cv2.findContours(img_bin,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
     masks=[]
