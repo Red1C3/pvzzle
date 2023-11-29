@@ -2,7 +2,6 @@ import cv2
 import numpy as np
 from utils import img_utils
 
-#NOTE Not finished yet
 # Assumes background is of a black solid color not close to the pieces's color
 def extract_pieces(img):
     img_blur=cv2.GaussianBlur(img,(5,5),None)
