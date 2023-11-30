@@ -1,5 +1,3 @@
-import cv2.cuda
-
 from utils import img_utils
 from jigsaw import pieces_detection
 

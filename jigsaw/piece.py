@@ -1,5 +1,6 @@
+from jigsaw import  pieces_types
 class Piece:
-    def __init__(self,x,y,w,h,sub_img,mask,contour,type):
+    def __init__(self,x,y,w,h,sub_img,mask,contour,type=pieces_types.UNKNOWN):
         self.x=x
         self.y=y
         self.w=w
