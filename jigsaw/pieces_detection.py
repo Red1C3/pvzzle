@@ -1,6 +1,8 @@
 import cv2
 import numpy as np
 from utils import img_utils
+from jigsaw import pieces_types
+from jigsaw.piece import Piece
 
 # Assumes background is of a black solid color not close to the pieces's color
 def extract_pieces(img):
@@ -19,5 +21,5 @@ def extract_pieces(img):
         piece=cv2.bitwise_and(img,img,mask=mask)
         x,y,w,h=cv2.boundingRect(contour)
         piece=piece[y:y+h,x:x+w]
-        pieces.append(piece)
+        pieces.append(Piece(x,y,w,h,piece,mask,contour,pieces_types.UNKNOWN))
     return pieces
