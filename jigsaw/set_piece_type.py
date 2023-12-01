@@ -35,5 +35,4 @@ def set_piece_type(piece):
                     direction_holder[0] = 1
                 elif y1 > sub_img_bbox[1] + sub_img_bbox[3] - 10:
                     direction_holder[1] = 1
-    print(direction_holder)
     piece.type = direction_mapping[tuple(direction_holder)]
