@@ -8,7 +8,7 @@ img = img_utils.read_img('./samples/lenna_jigsaw.png')
 pieces=pieces_detection.extract_pieces(img)
 
 pieces[0].type = PieceType.LEFT_UP
-pieces[0].match(pieces[1], 100, MatchDir.RIGHT)
+print(pieces[0].match(pieces[1], 100, MatchDir.RIGHT, max_error=0.1))
 
 
 img_utils.close_all_windows()

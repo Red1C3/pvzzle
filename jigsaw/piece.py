@@ -1,5 +1,8 @@
+import math
+
 import cv2
 import numpy as np
+from scipy.stats import norm
 
 from jigsaw.match_directions import MatchDir
 from jigsaw.pieces_types import PieceType
@@ -47,7 +50,19 @@ class Piece:
                 zeros_runs = Piece._zeros_runs(row)
                 if len(zeros_runs) == 1:
                     matches.append(zeros_runs[0][1] - zeros_runs[0][0])
-            print(matches)
+            max_match = max(matches)  # TODO refactor
+            for i in range(len(matches)):
+                matches[i] /= max_match
+            mu, std = norm.fit(matches)
+            error = 0
+            for match in matches:
+                if abs(match - mu) < std * 3:
+                    error += math.pow(match - mu, 2)
+            if error < max_error:
+                return True, mu * max_match
+            else:
+                return False, None
+
 
     # https://stackoverflow.com/questions/24885092/finding-the-consecutive-zeros-in-a-numpy-array
     def _zeros_runs(a):
