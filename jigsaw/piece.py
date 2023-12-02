@@ -38,7 +38,7 @@ class Piece:
                     padding[1] += other_piece.h - self.h
             else:
                 pass  # TODO
-            padding[3] += self.w
+            padding[2] += self.w
             cat = cv2.hconcat([self_img, other_img])
         if direction == MatchDir.LEFT:
             cat = cv2.hconcat([other_img, self_img])
@@ -66,7 +66,7 @@ class Piece:
                 if abs(match - mu) < std * 3:
                     error += math.pow(match - mu, 2)
             if error < max_error:
-                padding[2] += mu * max_match
+                padding[2] -= mu * max_match
                 return True, padding
             else:
                 return False, None
