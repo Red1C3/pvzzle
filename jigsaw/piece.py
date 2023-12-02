@@ -19,7 +19,11 @@ class Piece:
         self.contour = contour
         self.type = type
 
+        self.sol_x = -1
+        self.sol_y = -1
+
     def match(self, other_piece, n_sample, direction: MatchDir, acceptable_ratio=1.0, max_error=0):
+        padding = [0, 0, 0, 0]  # top bottom left right
         self_img = self.sub_img.copy()
         other_img = other_piece.sub_img.copy()
         if direction == MatchDir.RIGHT:
@@ -27,11 +31,14 @@ class Piece:
                 if self.h > other_piece.h:
                     other_img = cv2.copyMakeBorder(other_img, 0, self.h - other_piece.h, 0, 0, cv2.BORDER_CONSTANT,
                                                    value=(0, 0, 0))
+                    padding[1] += self.h - other_piece.h
                 else:
                     self_img = cv2.copyMakeBorder(self_img, 0, other_piece.h - self.h, 0, 0, cv2.BORDER_CONSTANT,
                                                   value=(0, 0, 0))
+                    padding[1] += other_piece.h - self.h
             else:
                 pass  # TODO
+            padding[3] += self.w
             cat = cv2.hconcat([self_img, other_img])
         if direction == MatchDir.LEFT:
             cat = cv2.hconcat([other_img, self_img])
@@ -59,7 +66,8 @@ class Piece:
                 if abs(match - mu) < std * 3:
                     error += math.pow(match - mu, 2)
             if error < max_error:
-                return True, mu * max_match
+                padding[2] += mu * max_match
+                return True, padding
             else:
                 return False, None
 
