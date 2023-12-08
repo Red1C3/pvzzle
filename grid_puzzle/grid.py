@@ -1,7 +1,7 @@
 import cv2
 import numpy as np
 from grid_puzzle.piece import Piece
-
+from utils import img_utils
 # Sizes are defined (width,height)
 class Grid:
     def __init__(self, img_colored, size):
@@ -33,3 +33,9 @@ class Grid:
         lines_of_interest=window[window_vertical_center-1:window_vertical_center+1,:]
         lines_of_interest=lines_of_interest//255
         return np.count_nonzero(lines_of_interest)
+    def process_piece(self,piece,window_ratio=0.1):
+        for p in self.pieces:
+            v_window=self.get_window([p.img,piece.img],window_ratio=window_ratio)
+            h_window=self.get_window([p.img,piece.img],False,window_ratio=window_ratio)
+            piece.up_dict[p]=self.get_sobel_window_score(img_utils.sobel_vertical_whole_img(v_window))
+            piece.left_dict[p]=self.get_sobel_window_score(img_utils.sobel_vertical_whole_img(np.transpose(h_window,[1,0,2]))) #TODO make sure it's transpoing correctly
