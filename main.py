@@ -1,10 +1,14 @@
 import numpy as np
-
+import tkinter as tk
+from tkinter import filedialog
+from PIL import Image, ImageTk
 from jigsaw import pieces_detection
 from jigsaw.match_directions import MatchDir
 from jigsaw.pieces_types import PieceType
 from utils import img_utils
 import cv2
+from UI.main_window import MainWindow
+'''
 img = img_utils.read_img('./samples/lenna_jigsaw.png')
 
 pieces = pieces_detection.extract_pieces(img)
@@ -27,3 +31,9 @@ new_img[0:temp_img.shape[0],0:temp_img.shape[1]]+=temp_img
 img_utils.display_img(new_img)
 
 img_utils.close_all_windows()
+'''
+
+if __name__ == "__main__":
+    root = tk.Tk()
+    main_window = MainWindow(root)
+    root.mainloop()

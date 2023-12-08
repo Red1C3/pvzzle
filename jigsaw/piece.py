@@ -18,7 +18,6 @@ class Piece:
         self.mask = mask
         self.contour = contour
         self.type = type
-
         self.sol_x = -1
         self.sol_y = -1
 
