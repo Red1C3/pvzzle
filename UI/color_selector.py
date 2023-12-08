@@ -20,7 +20,8 @@ class ColorSelector:
         self.image_label.image = tk_img
         self.image_label.pack()
         self.create_widgets(self.color_selector_window)
-        self.color_selector_window.mainloop()
+        # Instead of calling mainloop, use wait_window to wait for the window to be closed
+        self.root.wait_window(self.color_selector_window)
 
     def scale_image_for_display(self):
         max_width = 1366
