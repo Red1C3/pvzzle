@@ -25,5 +25,6 @@ def extract_pieces(img):
         if w * h > min_piece_area:
             piece = cv2.bitwise_and(img, img, mask=mask)
             piece = piece[y:y + h, x:x + w]
-            pieces.append(Piece(x, y, w, h, piece, mask, contour, PieceType.UNKNOWN))   
+            contour_normalized = contour - np.array([x, y])
+            pieces.append(Piece(x, y, w, h, piece, mask, contour_normalized, PieceType.UNKNOWN))  
     return pieces
