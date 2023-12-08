@@ -12,5 +12,5 @@ def close_all_windows():
 
 def sobel_vertical_whole_img(img):
     img=cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
-    sobel= cv2.Sobel(img,cv2.CV_16S,0,1,ksize=img.shape[0]//2+1)
+    sobel= cv2.Sobel(img,cv2.CV_16S,0,1,ksize=3)
     return cv2.convertScaleAbs(sobel)
