@@ -1,4 +1,5 @@
 import cv2
+from grid_puzzle.piece import Piece
 
 # Sizes are defined (width,height)
 class Grid:
@@ -6,6 +7,10 @@ class Grid:
         self.img = img_colored
         self.size = size
         self.piece_size = ((img_colored.shape[1]) // size[0], (img_colored.shape[0]) // size[1])
+        self.pieces=[]
+        for i in range(size[0]):
+            for j in range(size[1]):
+                self.pieces.append(Piece(self.get_piece((i,j))))
 
     def get_piece(self, coordinates):
         c = coordinates
