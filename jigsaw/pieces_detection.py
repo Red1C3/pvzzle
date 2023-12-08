@@ -8,7 +8,7 @@ from jigsaw.piece import Piece
 def extract_pieces(img):
     img_blur=cv2.GaussianBlur(img,(5,5),None)
     img_gray=cv2.cvtColor(img_blur,cv2.COLOR_BGR2GRAY)
-    _,img_bin=cv2.threshold(img_gray,20,255,cv2.THRESH_BINARY)
+    _,img_bin=cv2.threshold(img_gray,0,255,cv2.THRESH_BINARY)
     kernel_closing = np.ones((9, 9), np.uint8)
     img_bin = cv2.morphologyEx(img_bin, cv2.MORPH_CLOSE, kernel_closing)
     img_bin=cv2.GaussianBlur(img_bin,(5,5),None)
