@@ -26,7 +26,7 @@ class MainWindow:
         self.conditions_met = False
 
         # Create the processing button and set its state to DISABLED
-        self.process_button = tk.Button(self.root, text="Process", command=self.process_image, state=tk.DISABLED)
+        self.process_button = tk.Button(self.root, text="Process and display", command=self.process_image, state=tk.DISABLED)
         self.process_button.pack(pady=(0, 10))
         self.pieces_len = tk.Label(self.root, text=' ')
         self.pieces_len.pack(padx=10, pady=(0, 10))  # Adjust pady for top padding
@@ -72,13 +72,11 @@ class MainWindow:
         # Get the current process ID
         pid = os.getpid()
         py = psutil.Process(pid)
-
         # Get memory usage
         memory_info = py.memory_info()
         print(f"Memory used: {memory_info.rss / 1024 / 1024:.2f} MB")
         pieces = extract_pieces(img, bgr_selected_color)
-        del img
-        self.pieces_len.config(text='"Image processing complete. Pieces detected : ' + str(len(pieces)))
+        self.pieces_len.config(text='Image processing complete. Pieces detected : ' + str(len(pieces)))
         print("Image processing complete.")
 
         

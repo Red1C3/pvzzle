@@ -1,4 +1,5 @@
 import cv2
+import copy
 import numpy as np
 from utils import img_utils
 from jigsaw.pieces_types import PieceType
@@ -15,11 +16,18 @@ def extract_pieces(img,background_color):
     kernel_closing = np.ones((9, 9), np.uint8)
     img_bin = cv2.morphologyEx(img_bin, cv2.MORPH_CLOSE, kernel_closing)
     contours, hierarchy = cv2.findContours(img_bin, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+    img_contours = copy.deepcopy(img)
+    cv2.drawContours(img_contours, contours, -1, (0, 255, 255), thickness=2)
+    img_contours_resized = cv2.resize(img_contours, (int(img_contours.shape[1]*0.4), int(img_contours.shape[0] *0.4)))
+    cv2.imshow('Contours of detected pieces', img_contours_resized)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
     masks = []
     for contour in contours:
         mask=np.zeros(np.shape(img_bin),'uint8')
         mask=cv2.drawContours(mask,[contour],-1,255,cv2.FILLED)
         masks.append(mask)
+
     min_piece_area = 5000
     pieces = []
     for mask, contour in zip(masks, contours):
