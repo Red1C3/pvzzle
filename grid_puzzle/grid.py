@@ -32,6 +32,8 @@ class Grid:
             window_size=int(two_pieces[0].shape[1]*window_ratio)
             return concated_pieces[:,concated_pieces_center_horizontally-window_size:concated_pieces_center_horizontally+window_size]
     def get_sobel_window_score(self,window):
+        kernel = np.array([[0, -1, 0], [-1, 5, -1], [0, -1, 0]])
+        window = cv2.filter2D(window, -1, kernel)
         window_vertical_center=window.shape[0]//2
         lines_of_interest=window[window_vertical_center-1:window_vertical_center+1,:]
         lines_of_interest=lines_of_interest//255
