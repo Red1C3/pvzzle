@@ -9,7 +9,7 @@ from jigsaw.pieces_types import PieceType
 
 
 class Piece:
-    def __init__(self, x, y, w, h, sub_img, mask, contour, type: PieceType = PieceType.UNKNOWN):
+    def init(self, x, y, w, h, sub_img, mask, contour,left_contour=[],right_contour=[],top_contour=[],bottom_contour=[],corners=[], type: PieceType = PieceType.UNKNOWN):
         self.x = x
         self.y = y
         self.w = w
@@ -17,10 +17,13 @@ class Piece:
         self.sub_img = sub_img
         self.mask = mask
         self.contour = contour
+        self.left_contour=left_contour
+        self.right_contour=right_contour
+        self.top_contour=top_contour
+        self.bottom=bottom_contour
+        self.corners=corners
         self.type = type
-        self.sol_x = -1
-        self.sol_y = -1
-
+        
     def match(self, other_piece, n_sample, direction: MatchDir, acceptable_ratio=1.0, max_error=0):
         padding = [0, 0, 0, 0]  # top bottom left right
         self_img = self.sub_img.copy()
