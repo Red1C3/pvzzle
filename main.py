@@ -1,15 +1,13 @@
-from utils import img_utils
-from grid_puzzle.grid import Grid
-img=img_utils.read_img('./samples/christmas-cats-500x204.jpg')
+import numpy as np
 
-grid=Grid(img,(2,2))
+from grid_puzzle.grid import Grid
+from utils import img_utils
+
+img = img_utils.read_img('./samples/snow.jpg')
+
+grid = Grid(img, (4, 4))
 
 grid.process_all_pieces()
-
-#sobel=img_utils.sobel_vertical_whole_img(img)
-
-#img_utils.display_img(grid.get_sobel_window_score(sobel))
-#img_utils.display_img(sobel)
 grid.clean_up_dicts()
 
 sol_size=len(grid.pieces)
@@ -36,7 +34,16 @@ def solve(pieces,current_loc):
                 pieces_cpy[(current_loc[0],current_loc[1]-1)]=p
                 solve(pieces_cpy,(current_loc[0],current_loc[1]-1))
 
-solve({(grid_size[0]-1,grid_size[1]-1):grid.pieces[3]},(grid_size[0]-1,grid_size[1]-1))
 
-print(solutions)
-        
+for piece in grid.pieces:
+    solve({(grid_size[0] - 1, grid_size[1] - 1): piece}, (grid_size[0] - 1, grid_size[1] - 1))
+
+grid_size = grid.size
+piece_size = grid.piece_size
+for s in solutions:
+    s_img = np.zeros((grid_size[1] * piece_size[1], grid_size[0] * piece_size[0], 3), 'uint8')
+    for loc, piece in s.items():
+        s_img[loc[1] * piece_size[1]:loc[1] * piece_size[1] + piece_size[1],
+        loc[0] * piece_size[0]:loc[0] * piece_size[0] + piece_size[0]] = piece.img
+
+    img_utils.display_img(s_img)
