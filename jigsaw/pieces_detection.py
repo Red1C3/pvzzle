@@ -25,9 +25,14 @@ def extract_pieces(img,background_color):
     for mask, contour in zip(masks, contours):
         x, y, w, h = cv2.boundingRect(contour)
         if w * h > min_piece_area:
-            piece = cv2.bitwise_and(img, img, mask=mask)
-            piece = piece[y:y + h, x:x + w]
+            mask = mask.astype(np.uint8)
+            mask_slice = mask[y:y + w, x:x + h]
+            img_slice = img[y:y + w, x:x + h].astype(np.uint8)
+            piece = cv2.bitwise_and(img_slice, img_slice, mask=mask_slice)
             contour_normalized = contour - np.array([x, y])
-            pieces.append(Piece(x, y, w, h, piece, mask, contour_normalized, PieceType.UNKNOWN))  
+            pieces.append(Piece(x, y, w, h, piece, mask, contour_normalized, PieceType.UNKNOWN)) 
+            mask = None
+            piece = None
+    contours = None
     return pieces
 
