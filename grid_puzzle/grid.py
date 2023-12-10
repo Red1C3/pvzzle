@@ -1,3 +1,5 @@
+import random
+
 import cv2
 import numpy as np
 
@@ -7,7 +9,7 @@ from utils import img_utils
 
 # Sizes are defined (width,height)
 class Grid:
-    def __init__(self, img_colored, size):
+    def __init__(self, img_colored, size, shuffle=True):
         self.img = img_colored
         self.size = size
         self.piece_size = ((img_colored.shape[1]) // size[0], (img_colored.shape[0]) // size[1])
@@ -15,6 +17,8 @@ class Grid:
         for i in range(size[0]):
             for j in range(size[1]):
                 self.pieces.append(Piece(self.get_piece((i, j))))
+        if shuffle:
+            random.shuffle(self.pieces)
 
     def get_piece(self, coordinates):
         c = coordinates
@@ -79,3 +83,18 @@ class Grid:
             val in p.up_dict.items() if val == min_val}
             min_val = list(p.left_dict.values())[0]
             p.left_dict = {key: val for key, val in p.left_dict.items() if val == min_val}
+
+    def get_pieces_img(self):
+        grid_size = self.size
+        piece_size = self.piece_size
+        i = 0
+        j = 0
+        s_img = np.zeros((grid_size[1] * piece_size[1], grid_size[0] * piece_size[0], 3), 'uint8')
+        for piece in self.pieces:
+            s_img[j * piece_size[1]:j * piece_size[1] + piece_size[1],
+            i * piece_size[0]:i * piece_size[0] + piece_size[0]] = piece.img
+            j += 1
+            if j == grid_size[1]:
+                j = 0
+                i += 1
+        return s_img
