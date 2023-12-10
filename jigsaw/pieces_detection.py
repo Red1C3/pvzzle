@@ -138,7 +138,15 @@ def extract_pieces(img,background_color):
         masks.append(mask)
 
     min_piece_area = 5000
-    pieces = []
+    left_up_piece = []
+    right_up_piece = []
+    left_down_piece = []
+    right_down_piece = []
+    center_up_pieces = []
+    center_down_pieces = []
+    center_left_pieces = []
+    center_right_pieces = []
+    center_pieces = []
     for mask, contour in zip(masks, contours):
         x, y, w, h = cv2.boundingRect(contour)
         if w * h > min_piece_area:
@@ -150,8 +158,26 @@ def extract_pieces(img,background_color):
             piece = Piece(x, y, w, h,sub_img,mask,contour_normalized,[],[],[],[],[],PieceType.UNKNOWN)
             set_piece_type(piece)
             contour_splitter(piece)
-            pieces.append(piece) 
+            if piece.type == PieceType.CENTER:
+                center_pieces.append(piece)
+            elif piece.type == PieceType.CENTER_UP:
+                center_up_pieces.append(piece)
+            elif piece.type == PieceType.CENTER_DOWN:
+                center_down_pieces.append(piece)
+            elif piece.type == PieceType.CENTER_LEFT:
+                center_left_pieces.append(piece)
+            elif piece.type == PieceType.CENTER_RIGHT:
+                center_right_pieces.append(piece)
+            elif piece.type == PieceType.LEFT_UP:
+                left_up_piece.append(piece)
+            elif piece.type == PieceType.RIGHT_UP:
+                right_up_piece.append(piece)
+            elif piece.type == PieceType.LEFT_DOWN:
+                left_down_piece.append(piece)
+            elif piece.type == PieceType.RIGHT_DOWN:
+                right_down_piece.append(piece)
+            
             mask = None
             piece = None
     contours = None
-    return pieces
+    return left_up_piece, right_up_piece, left_down_piece, right_down_piece,center_up_pieces, center_down_pieces, center_left_pieces, center_right_pieces, center_pieces,img.shape[1], img.shape[0]

@@ -75,8 +75,9 @@ class MainWindow:
         # Get memory usage
         memory_info = py.memory_info()
         print(f"Memory used: {memory_info.rss / 1024 / 1024:.2f} MB")
-        pieces = extract_pieces(img, bgr_selected_color)
-        self.pieces_len.config(text='Image processing complete. Pieces detected : ' + str(len(pieces)))
+        left_up_piece, right_up_piece, left_down_piece, right_down_piece,center_up_pieces, center_down_pieces, center_left_pieces, center_right_pieces, center_pieces = extract_pieces(img, bgr_selected_color)
+        total_pieces_count = 4 + len(center_up_pieces) + len(center_down_pieces) + len(center_left_pieces) + len(center_right_pieces) + len(center_pieces)
+        self.pieces_len.config(text='Image processing complete. Pieces detected : ' + str(total_pieces_count))
         print("Image processing complete.")
 
         
