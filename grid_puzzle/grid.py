@@ -9,20 +9,25 @@ from utils import img_utils
 
 # Sizes are defined (width,height)
 class Grid:
-    def __init__(self, img_colored, size, shuffle=True):
+    def __init__(self, img_colored, size, shuffle=True, hint=None):
         self.img = img_colored
         self.size = size
         self.piece_size = ((img_colored.shape[1]) // size[0], (img_colored.shape[0]) // size[1])
         self.pieces = []
         for i in range(size[0]):
             for j in range(size[1]):
-                self.pieces.append(Piece(self.get_piece((i, j))))
+                self.pieces.append(Piece(self.get_piece(img_colored, (i, j))))
         if shuffle:
             random.shuffle(self.pieces)
+        if hint is not None:
+            self.hint_pieces = {}
+            for i in range(size[0]):
+                for j in range(size[1]):
+                    self.hint_pieces[(i, j)] = Piece(self.get_piece(hint, (i, j)))
 
-    def get_piece(self, coordinates):
+    def get_piece(self, img, coordinates):
         c = coordinates
-        return self.img[c[1] * self.piece_size[1]:c[1] * self.piece_size[1] + self.piece_size[1],
+        return img[c[1] * self.piece_size[1]:c[1] * self.piece_size[1] + self.piece_size[1],
                c[0] * self.piece_size[0]:c[0] * self.piece_size[0] + self.piece_size[0]]
 
     def get_window(self, two_pieces, vertical=True, window_ratio=0.1):
