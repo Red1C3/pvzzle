@@ -106,12 +106,12 @@ class Grid:
             p.left_dict = {k: v for k, v in sorted(p.left_dict.items(), key=lambda item: item[1])}
 
     def clean_up_dicts(self):
+        epsilon = 1e-8
         for p in self.pieces:
-            min_val = list(p.up_dict.values())[0]
-            p.up_dict = {key: val for key,
-            val in p.up_dict.items() if val == min_val}
-            min_val = list(p.left_dict.values())[0]
-            p.left_dict = {key: val for key, val in p.left_dict.items() if val == min_val}
+            min_val = list(p.up_dict.values())[1]
+            p.up_dict = {key: val for key, val in p.up_dict.items() if val < min_val+epsilon}
+            min_val = list(p.left_dict.values())[1]
+            p.left_dict = {key: val for key, val in p.left_dict.items() if val < min_val+epsilon}
 
     def get_pieces_img(self):
         grid_size = self.size
