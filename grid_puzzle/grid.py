@@ -54,7 +54,7 @@ class Grid:
         if unique_lines_of_interest[-1] == 0:
             return 0
         lines_of_interest = lines_of_interest // unique_lines_of_interest[-1]
-        return np.count_nonzero(lines_of_interest)
+        return np.count_nonzero(lines_of_interest)/lines_of_interest.size
 
     def get_most_popular_color_window_score(self, window):
         window_vertical_center = window.shape[0] // 2
