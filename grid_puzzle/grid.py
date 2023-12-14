@@ -68,31 +68,31 @@ class Grid:
         window_down_most_freq_color = np.argmax(np.bincount(window_down))
         return abs(window_top_most_freq_color - window_down_most_freq_color)
 
-    def corr(self,win,v=True):
+    def unCorrelation (self,win,v=True):
         if v:
             center = win.shape[0]//2
-            f = win[center,:]
-            s = win[-1,:]
+            f = win[center-1,:]
+            s = win[center,:]
 
         else:
             center = win.shape[1]//2
             f = win[:,center-1]
-            s = win[:,-1]
+            s = win[:,center]
 
-        img_utils.display_img(win)
         score = 0
         for i in range (3):
             fr = f[:,i]
             sr = s[:,i]
             score += abs(pearsonr(fr,sr)[0])
-        return score/3
+            if np.isnan(score):
+                return 10
+        return 1-score/3
 
             
 
     def process_piece(self, piece, window_ratio=0.1):
         for p in self.pieces:
             v_window = self.get_window([p.img, piece.img], window_ratio=window_ratio)
-            print(self.corr(v_window))
             h_window = self.get_window([p.img, piece.img], False, window_ratio=window_ratio)
             print(self.corr(h_window,v=False))
             piece.up_dict[p] = self.get_sobel_window_score(img_utils.sobel_vertical_whole_img(v_window))
