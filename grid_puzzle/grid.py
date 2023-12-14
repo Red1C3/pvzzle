@@ -93,11 +93,15 @@ class Grid:
     def process_piece(self, piece, window_ratio=0.1):
         for p in self.pieces:
             v_window = self.get_window([p.img, piece.img], window_ratio=window_ratio)
+            v_sobel_score = self.get_sobel_window_score(img_utils.sobel_vertical_whole_img(v_window))
+            v_uncorr_score = self.unCorrelation(v_window)
+
             h_window = self.get_window([p.img, piece.img], False, window_ratio=window_ratio)
-            print(self.corr(h_window,v=False))
-            piece.up_dict[p] = self.get_sobel_window_score(img_utils.sobel_vertical_whole_img(v_window))
-            piece.left_dict[p] = self.get_sobel_window_score(img_utils.sobel_vertical_whole_img(
-                np.transpose(h_window, [1, 0, 2])))
+            h_sobel_score = self.get_sobel_window_score(img_utils.sobel_vertical_whole_img(np.transpose(h_window, [1, 0, 2])))
+            h_uncorr_score = self.unCorrelation(h_window,v=False)
+
+            piece.up_dict[p] = v_sobel_score + v_uncorr_score
+            piece.left_dict[p] = h_sobel_score + h_uncorr_score
 
     def process_all_pieces(self, window_ratio=0.1):
         for p in self.pieces:
