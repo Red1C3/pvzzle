@@ -1,3 +1,4 @@
+import cv2
 import numpy as np
 
 from grid_puzzle.grid import Grid
@@ -13,14 +14,19 @@ class HintSolver:
     def sift_equal(self, piece1, piece2):
         kps1, des1 = piece1.get_sift_features()
         kps2, des2 = piece2.get_sift_features()
-        error = 0
         if des1 is None and des2 is None:
-            return (piece1.img[0, 0, :] == piece2.img[0, 0, :]).all()
+            return np.all(piece1.img[0, 0, :] == piece2.img[0, 0, :])
         if (des1 is None and des2 is not None) or (des2 is None and des1 is not None):
             return False
-        for de1, de2 in zip(des1, des2):
-            error += np.linalg.norm(de1 - de2) ** 2
-        return error / len(des1) < ERROR_THRESHOLD
+
+        matcher = cv2.DescriptorMatcher_create(cv2.DescriptorMatcher_FLANNBASED)
+        knn_matches = matcher.knnMatch(des1, des2, 2)
+        ratio_threshold = 0.7
+        good_matches = []
+        for m, n in knn_matches:
+            if m.distance < ratio_threshold * n.distance:
+                good_matches.append(m)
+        return len(good_matches) > len(knn_matches) * 0.4
 
     def solve(self):
         solution = {}

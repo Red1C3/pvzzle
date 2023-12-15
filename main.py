@@ -3,8 +3,9 @@ from grid_puzzle.hint_solver import HintSolver
 from utils import img_utils
 
 img = img_utils.read_img('./samples/christmas-cats-500x204.jpg')
+hint = img_utils.read_img('./samples/christmas-cats-1000x408.jpg')
 
-grid = Grid(img, (8, 8), shuffle=True, hint=img)
+grid = Grid(img, (3, 3), shuffle=True, hint=hint)
 
 img_utils.display_img(grid.get_pieces_img())
 

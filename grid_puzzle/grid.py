@@ -16,19 +16,20 @@ class Grid:
         self.pieces = []
         for i in range(size[0]):
             for j in range(size[1]):
-                self.pieces.append(Piece(self.get_piece(img_colored, (i, j))))
+                self.pieces.append(Piece(self.get_piece(img_colored, (i, j), self.piece_size)))
         if shuffle:
             random.shuffle(self.pieces)
         if hint is not None:
             self.hint_pieces = {}
+            self.hint_piece_size = ((hint.shape[1]) // size[0], (hint.shape[0]) // size[1])
             for i in range(size[0]):
                 for j in range(size[1]):
-                    self.hint_pieces[(i, j)] = Piece(self.get_piece(hint, (i, j)))
+                    self.hint_pieces[(i, j)] = Piece(self.get_piece(hint, (i, j), self.hint_piece_size))
 
-    def get_piece(self, img, coordinates):
+    def get_piece(self, img, coordinates, piece_size):
         c = coordinates
-        return img[c[1] * self.piece_size[1]:c[1] * self.piece_size[1] + self.piece_size[1],
-               c[0] * self.piece_size[0]:c[0] * self.piece_size[0] + self.piece_size[0]]
+        return img[c[1] * piece_size[1]:c[1] * piece_size[1] + piece_size[1],
+               c[0] * piece_size[0]:c[0] * piece_size[0] + piece_size[0]]
 
     def get_window(self, two_pieces, vertical=True, window_ratio=0.1):
         if vertical:
