@@ -82,7 +82,7 @@ def contour_splitter(piece):
     # Assignment of edge arrays
     piece.left_contour=left_side
     piece.bottom_contour=bottom_side
-    piece.right_contour=right_side
+    piece.right_contour=right_side[::-1]
     piece.top_contour=top_side
     piece.corners=closest_points
    
@@ -151,8 +151,8 @@ def extract_pieces(img,background_color):
         x, y, w, h = cv2.boundingRect(contour)
         if w * h > min_piece_area:
             mask = mask.astype(np.uint8)
-            mask_slice = mask[y - 5:y + h + 5, x - 5:x + w + 5]
-            img_slice = img[y - 5:y + h + 5, x - 5:x + w + 5].astype(np.uint8)
+            mask_slice = mask[y :y + h , x :x + w ]
+            img_slice = img[y :y + h , x :x + w ].astype(np.uint8)
             sub_img = cv2.bitwise_and(img_slice, img_slice, mask=mask_slice)
             contour_normalized = contour - np.array([x, y])
             piece = Piece(x, y, w, h,sub_img,mask,contour_normalized,[],[],[],[],[],PieceType.UNKNOWN)
