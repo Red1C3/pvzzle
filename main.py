@@ -4,7 +4,7 @@ from utils import img_utils
 
 img = img_utils.read_img('./samples/christmas-cats-500x204.jpg')
 
-grid = Grid(img, (6, 6), shuffle=True, hint=img)
+grid = Grid(img, (2,2), shuffle=True, hint=img)
 
 img_utils.display_img(grid.get_pieces_img())
 
