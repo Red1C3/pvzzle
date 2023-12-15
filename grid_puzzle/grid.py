@@ -85,7 +85,7 @@ class Grid:
             sr = s[:,i]
             score += abs(pearsonr(fr,sr)[0])
             if np.isnan(score):
-                return 10
+                return 1
         return 1-score/3
 
             
