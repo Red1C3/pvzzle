@@ -33,6 +33,7 @@ class GreedySolver:
         grid_size = self.grid.size
         for piece in self.grid.pieces:
             self._solve({(grid_size[0] - 1, grid_size[1] - 1): piece}, (grid_size[0] - 1, grid_size[1] - 1),0)
+        self.solutions = sorted(self.solutions, key=lambda item: item[1])
         return self.solutions
 
     def get_solution_img(self, solution):
