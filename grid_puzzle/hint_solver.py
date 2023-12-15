@@ -2,7 +2,7 @@ import numpy as np
 
 from grid_puzzle.grid import Grid
 
-DISTANCE_THRESHOLD = 0.01
+DISTANCE_THRESHOLD = 1e-9
 ERROR_THRESHOLD = 100000
 
 
@@ -21,7 +21,6 @@ class HintSolver:
         for kp in kps2:
             kp.pt = (
                 kp.pt[0]/piece2.img.shape[1], kp.pt[1]/piece2.img.shape[0])
-
         for kp1, de1 in zip(kps1, des1):
             for kp2, de2 in zip(kps2, des2):
                 dis = np.linalg.norm(np.array(kp1.pt) - np.array(kp2.pt))
