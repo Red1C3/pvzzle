@@ -3,7 +3,7 @@ import numpy as np
 from grid_puzzle.grid import Grid
 
 DISTANCE_THRESHOLD = 1e-9
-ERROR_THRESHOLD = 100000
+ERROR_THRESHOLD = 0.001
 
 
 class HintSolver:
@@ -13,25 +13,14 @@ class HintSolver:
     def sift_equal(self, piece1, piece2):
         kps1, des1 = piece1.get_sift_features()
         kps2, des2 = piece2.get_sift_features()
-        matching_points_count = 0
         error = 0
-        for kp in kps1:
-            kp.pt = (
-                kp.pt[0]/piece1.img.shape[1], kp.pt[1]/piece1.img.shape[0])
-        for kp in kps2:
-            kp.pt = (
-                kp.pt[0]/piece2.img.shape[1], kp.pt[1]/piece2.img.shape[0])
-        for kp1, de1 in zip(kps1, des1):
-            for kp2, de2 in zip(kps2, des2):
-                dis = np.linalg.norm(np.array(kp1.pt) - np.array(kp2.pt))
-                if dis < DISTANCE_THRESHOLD:
-                    matching_points_count += 1
-                    error += np.linalg.norm(de1 - de2)**2
-                    if error > ERROR_THRESHOLD:
-                        return False
-        if matching_points_count == 0:
+        if des1 is None and des2 is None:
+            return (piece1.img[0, 0, :] == piece2.img[0, 0, :]).all()
+        if (des1 is None and des2 is not None) or (des2 is None and des1 is not None):
             return False
-        return error/matching_points_count < ERROR_THRESHOLD
+        for de1, de2 in zip(des1, des2):
+            error += np.linalg.norm(de1 - de2) ** 2
+        return error / len(des1) < ERROR_THRESHOLD
 
     def solve(self):
         solution = {}
