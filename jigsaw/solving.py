@@ -49,7 +49,6 @@ def solve_on_contours(left_up_piece, right_up_piece, left_down_piece, right_down
     end_col_right = start_col_right + right_up_piece_img.shape[1]
     solved_img[:right_up_piece_img.shape[0], start_col_right:end_col_right] = right_up_piece_img
     matched_pieces.append(right_up_piece[0])
-    center_up_pieces.remove(right_up_piece[0])
     cv2.imshow('Solved Image', solved_img)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
