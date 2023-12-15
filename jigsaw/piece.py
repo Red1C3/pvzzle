@@ -82,3 +82,18 @@ class Piece:
         # Runs start and end where absdiff is 1.
         ranges = np.where(absdiff == 1)[0].reshape(-1, 2)
         return ranges
+    def display_with_contours(self):
+            # Create a black image
+            display_img = np.zeros_like(self.sub_img)
+            # Draw the contours with different colors
+            cv2.drawContours(display_img, [self.left_contour], -1, (0, 0, 255), 2)  # Red for left contour
+            cv2.drawContours(display_img, [self.right_contour], -1, (0, 255, 0), 2)  # Green for right contour
+            #cv2.drawContours(display_img, [self.top_contour], -1, (255, 0, 0), 2)  # Blue for top contour
+            cv2.drawContours(display_img, [self.bottom_contour], -1, (255, 255, 0), 2)  # Cyan for bottom contour
+            # Draw corners
+            for corner in self.corners:
+                cv2.circle(display_img, tuple(corner), 5, (0, 255, 255), -1)  # Yellow for corners
+            # Display the image
+            cv2.imshow("Piece with Contours and Corners", display_img)
+            cv2.waitKey(0)
+            cv2.destroyAllWindows()
