@@ -4,6 +4,7 @@ from tkinter import filedialog
 import cv2
 import ctypes
 from jigsaw.pieces_detection import extract_pieces
+from jigsaw.solving import solve_on_contours
 import psutil
 
 
@@ -75,9 +76,10 @@ class MainWindow:
         # Get memory usage
         memory_info = py.memory_info()
         print(f"Memory used: {memory_info.rss / 1024 / 1024:.2f} MB")
-        left_up_piece, right_up_piece, left_down_piece, right_down_piece,center_up_pieces, center_down_pieces, center_left_pieces, center_right_pieces, center_pieces = extract_pieces(img, bgr_selected_color)
+        left_up_piece, right_up_piece, left_down_piece, right_down_piece,center_up_pieces, center_down_pieces, center_left_pieces, center_right_pieces, center_pieces,w,h = extract_pieces(img, bgr_selected_color)
         total_pieces_count = 4 + len(center_up_pieces) + len(center_down_pieces) + len(center_left_pieces) + len(center_right_pieces) + len(center_pieces)
         self.pieces_len.config(text='Image processing complete. Pieces detected : ' + str(total_pieces_count))
+        solve_on_contours(left_up_piece, right_up_piece, left_down_piece, right_down_piece, center_up_pieces, center_down_pieces, center_left_pieces, center_right_pieces, center_pieces, w, h)
         print("Image processing complete.")
 
         
