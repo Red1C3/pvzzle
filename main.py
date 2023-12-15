@@ -14,3 +14,5 @@ grid.clean_up_dicts()
 solver = GreedySolver(grid)
 solutions = solver.solve()
 img_utils.display_img(solver.get_solution_img(solutions[0]),"Solution")
+
+img_utils.close_all_windows()
