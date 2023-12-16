@@ -44,25 +44,31 @@ def set_piece_type(piece):
             ###  DETECT CORNERS & SET CONTOUR ON EVERY DIRECTION BASED ON THE MAIN CONTOUR   ###
    
 def contour_splitter(piece):
-    corners = np.array([[0, 0], [0, piece.h], [piece.w, piece.h],[piece.w, 0] ])
+    corners_of_border = np.array([[0, 0], [0, piece.h], [piece.w, piece.h],[piece.w, 0] ])
     contour_points = piece.contour.reshape(-1, 2)
     len_contour_points=len(contour_points)
     closest_points = []
-    Indexs= []
     left_side=[]
     bottom_side=[]
     right_side=[]
     top_side=[]
-    for corner in corners:
-        # Calculate distances between the corner and all contour points
-        distances = np.linalg.norm(contour_points - corner, axis=1)
-        # Find the index of the closest point
-        closest_index = np.argmin(distances)
-        # Get the closest point
-        closest_point = tuple(contour_points[closest_index])
+    image = piece.mask.copy()
+    corners_detected = cv2.goodFeaturesToTrack(image, maxCorners=10, qualityLevel=0.01, minDistance=40)
+    corners_detected = np.int0(corners_detected)
+    normalized_corners_detected = corners_detected - np.array([piece.x, piece.y])
+    closest_points = []
+    for border_corner in corners_of_border:
+        min_distance = float('inf')  
+        closest_point = None
+
+        for detected_point in normalized_corners_detected:
+            distance = np.linalg.norm(border_corner - detected_point)
+            if distance < min_distance:
+                min_distance = distance
+                closest_point = detected_point
         closest_points.append(closest_point)
-        Indexs.append(closest_index)
-    # handle every status for edges
+    closest_points = np.vstack(closest_points)
+    Indexs = [np.argmin(np.linalg.norm(contour_points - closest_point, axis=1)) for closest_point in closest_points]
     left_side = contour_points [Indexs[0]:Indexs[1]+1]
     bottom_side = contour_points [Indexs[1]:Indexs[2]+1]
     right_side= contour_points [Indexs[2]:Indexs[3]+1]

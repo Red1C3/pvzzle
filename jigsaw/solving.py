@@ -1,6 +1,6 @@
 import numpy as np
 import cv2
-from pieces_detection import extract_pieces
+#from jigsaw.pieces_detection import extract_pieces
 
 def get_bump_direction_left_right(contour):
     epsilon = 0.01 * cv2.arcLength(contour, True)
