@@ -5,7 +5,8 @@ import numpy as np
 
 from grid_puzzle.piece import Piece
 from utils import img_utils
-
+from scipy.stats.stats import pearsonr   
+ 
 
 # Sizes are defined (width,height)
 class Grid:
@@ -54,7 +55,7 @@ class Grid:
         if unique_lines_of_interest[-1] == 0:
             return 0
         lines_of_interest = lines_of_interest // unique_lines_of_interest[-1]
-        return np.count_nonzero(lines_of_interest)
+        return np.count_nonzero(lines_of_interest)/lines_of_interest.size
 
     def get_most_popular_color_window_score(self, window):
         window_vertical_center = window.shape[0] // 2
@@ -68,13 +69,40 @@ class Grid:
         window_down_most_freq_color = np.argmax(np.bincount(window_down))
         return abs(window_top_most_freq_color - window_down_most_freq_color)
 
+    def unCorrelation (self,win,v=True):
+        if v:
+            center = win.shape[0]//2
+            f = win[center-1,:]
+            s = win[center,:]
+
+        else:
+            center = win.shape[1]//2
+            f = win[:,center-1]
+            s = win[:,center]
+
+        score = 0
+        for i in range (3):
+            fr = f[:,i]
+            sr = s[:,i]
+            score += abs(pearsonr(fr,sr)[0])
+            if np.isnan(score):
+                return 1
+        return 1-score/3
+
+            
+
     def process_piece(self, piece, window_ratio=0.1):
         for p in self.pieces:
             v_window = self.get_window([p.img, piece.img], window_ratio=window_ratio)
+            v_sobel_score = self.get_sobel_window_score(img_utils.sobel_vertical_whole_img(v_window))
+            v_uncorr_score = self.unCorrelation(v_window)
+
             h_window = self.get_window([p.img, piece.img], False, window_ratio=window_ratio)
-            piece.up_dict[p] = self.get_sobel_window_score(img_utils.sobel_vertical_whole_img(v_window))
-            piece.left_dict[p] = self.get_sobel_window_score(img_utils.sobel_vertical_whole_img(
-                np.transpose(h_window, [1, 0, 2])))
+            h_sobel_score = self.get_sobel_window_score(img_utils.sobel_vertical_whole_img(np.transpose(h_window, [1, 0, 2])))
+            h_uncorr_score = self.unCorrelation(h_window,v=False)
+
+            piece.up_dict[p] = v_sobel_score + v_uncorr_score
+            piece.left_dict[p] = h_sobel_score + h_uncorr_score
 
     def process_all_pieces(self, window_ratio=0.1):
         for p in self.pieces:
@@ -83,12 +111,13 @@ class Grid:
             p.left_dict = {k: v for k, v in sorted(p.left_dict.items(), key=lambda item: item[1])}
 
     def clean_up_dicts(self):
+        numberOfVal=max(self.size)//7
+        epsilon = 1e-8
         for p in self.pieces:
-            min_val = list(p.up_dict.values())[0]
-            p.up_dict = {key: val for key,
-            val in p.up_dict.items() if val == min_val}
-            min_val = list(p.left_dict.values())[0]
-            p.left_dict = {key: val for key, val in p.left_dict.items() if val == min_val}
+            min_val = list(p.up_dict.values())[numberOfVal]
+            p.up_dict = {key: val for key, val in p.up_dict.items() if val < min_val+epsilon}
+            min_val = list(p.left_dict.values())[numberOfVal]
+            p.left_dict = {key: val for key, val in p.left_dict.items() if val < min_val+epsilon}
 
     def get_pieces_img(self):
         grid_size = self.size

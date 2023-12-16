@@ -1,16 +1,18 @@
 from grid_puzzle.grid import Grid
-from grid_puzzle.hint_solver import HintSolver
+from grid_puzzle.greedy_solver import GreedySolver
 from utils import img_utils
 
 img = img_utils.read_img('./samples/christmas-cats-500x204.jpg')
-hint = img_utils.read_img('./samples/christmas-cats-1000x408.jpg')
 
-grid = Grid(img, (5, 5), shuffle=True, hint=hint)
+grid = Grid(img, (2,1), shuffle=True, hint=img)
 
-img_utils.display_img(grid.get_pieces_img())
+img_utils.display_img(grid.get_pieces_img(),"Puzzle")
 
-solver = HintSolver(grid)
+grid.process_all_pieces()
+grid.clean_up_dicts()
+
+solver = GreedySolver(grid)
 solutions = solver.solve()
+img_utils.display_img(solver.get_solution_img(solutions[0]),"Solution")
 
-for s in solutions:
-    img_utils.display_img(solver.get_solution_img(s))
+img_utils.close_all_windows()
