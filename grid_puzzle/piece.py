@@ -14,20 +14,38 @@ class Piece:
         return sift.detectAndCompute(gray,None)
 
     def get_quantized_img(self, levels=8):
-        gray = cv2.cvtColor(self.img, cv2.COLOR_BGR2GRAY)
-        gray = np.round(gray * (levels / 255)) * (255 / levels)
-        return gray, levels
+        quantized = np.round(self.img * (levels / 255)) * (255 / levels)
+        return quantized, levels
 
     def get_quantization_vector(self, levels=8):
         qimg, _ = self.get_quantized_img(levels)
         steps = np.linspace(0, 255, levels + 1)
         vec = []
-        unique, counts = np.unique(qimg, return_counts=True)
-        unique_counts = dict(zip(unique, counts))
+
+        unique, counts = np.unique(qimg[:, :, 0], return_counts=True)
+        unique_counts_b = dict(zip(unique, counts))
+        unique, counts = np.unique(qimg[:, :, 1], return_counts=True)
+        unique_counts_g = dict(zip(unique, counts))
+        unique, counts = np.unique(qimg[:, :, 2], return_counts=True)
+        unique_counts_r = dict(zip(unique, counts))
+
         total_elements_count = qimg.shape[0] * qimg.shape[1]
+
         for step in steps:
-            if step in unique_counts.keys():
-                vec.append(unique_counts[step] / total_elements_count)
+            if step in unique_counts_b.keys():
+                vec.append(unique_counts_b[step] / total_elements_count)
+            else:
+                vec.append(0)
+
+        for step in steps:
+            if step in unique_counts_g.keys():
+                vec.append(unique_counts_g[step] / total_elements_count)
+            else:
+                vec.append(0)
+
+        for step in steps:
+            if step in unique_counts_r.keys():
+                vec.append(unique_counts_r[step] / total_elements_count)
             else:
                 vec.append(0)
         return vec
