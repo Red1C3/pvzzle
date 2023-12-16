@@ -12,7 +12,7 @@ class HintQuantSolver:
         vec2 = np.array(piece2.get_quantization_vector(levels))
         return np.linalg.norm(vec1 - vec2)
 
-    def solve(self, levels=16):
+    def solve(self, levels=8):
         solution = {}
         for piece in self.grid.pieces:
             piece_matches = {}
