@@ -2,11 +2,11 @@ import random
 
 import cv2
 import numpy as np
+from scipy.stats.stats import pearsonr
 
 from grid_puzzle.piece import Piece
 from utils import img_utils
-from scipy.stats.stats import pearsonr   
- 
+
 
 # Sizes are defined (width,height)
 class Grid:
@@ -17,7 +17,7 @@ class Grid:
         self.pieces = []
         for i in range(size[0]):
             for j in range(size[1]):
-                self.pieces.append(Piece(self.get_piece(img_colored, (i, j), self.piece_size)))
+                self.pieces.append(Piece(Grid.get_piece(img_colored, (i, j), self.piece_size)))
         if shuffle:
             random.shuffle(self.pieces)
         if hint is not None:
@@ -25,9 +25,9 @@ class Grid:
             self.hint_piece_size = ((hint.shape[1]) // size[0], (hint.shape[0]) // size[1])
             for i in range(size[0]):
                 for j in range(size[1]):
-                    self.hint_pieces[(i, j)] = Piece(self.get_piece(hint, (i, j), self.hint_piece_size))
+                    self.hint_pieces[(i, j)] = Piece(Grid.get_piece(hint, (i, j), self.hint_piece_size))
 
-    def get_piece(self, img, coordinates, piece_size):
+    def get_piece(img, coordinates, piece_size):
         c = coordinates
         return img[c[1] * piece_size[1]:c[1] * piece_size[1] + piece_size[1],
                c[0] * piece_size[0]:c[0] * piece_size[0] + piece_size[0]]

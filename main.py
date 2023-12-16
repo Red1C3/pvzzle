@@ -1,11 +1,16 @@
+import cv2
 import numpy as np
 
 from jigsaw import pieces_detection
+from jigsaw.jigsaw import Jigsaw
 from jigsaw.match_directions import MatchDir
 from jigsaw.pieces_types import PieceType
 from utils import img_utils
-import cv2
+
 img = img_utils.read_img('./samples/lenna_jigsaw.png')
+hint = img_utils.read_img("./samples/lenna.png")
+
+jig = Jigsaw(img, hint)
 
 pieces = pieces_detection.extract_pieces(img)
 
