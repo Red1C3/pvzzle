@@ -48,20 +48,19 @@ def contour_splitter(piece):
     contour_points = piece.contour.reshape(-1, 2)
     len_contour_points=len(contour_points)
     closest_points = []
+    #Indexs= []
     left_side=[]
     bottom_side=[]
     right_side=[]
     top_side=[]
-    image = piece.mask.copy()
+    image = piece.mask[piece.y - 2:piece.y + piece.h + 2, piece.x -2 :piece.x + piece.w + 2]
     corners_detected = cv2.goodFeaturesToTrack(image, maxCorners=10, qualityLevel=0.01, minDistance=40)
     corners_detected = np.int0(corners_detected)
-    normalized_corners_detected = corners_detected - np.array([piece.x, piece.y])
     closest_points = []
     for border_corner in corners_of_border:
         min_distance = float('inf')  
         closest_point = None
-
-        for detected_point in normalized_corners_detected:
+        for detected_point in corners_detected - np.array([2, 2]):
             distance = np.linalg.norm(border_corner - detected_point)
             if distance < min_distance:
                 min_distance = distance
@@ -82,6 +81,7 @@ def contour_splitter(piece):
     piece.right_contour=right_side[::-1]
     piece.top_contour=top_side
     piece.corners=closest_points
+
 
 
             ### EXTRACT PIECES WITH ALL FEAUTERS SET ###
