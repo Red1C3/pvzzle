@@ -81,7 +81,7 @@ class Piece:
         ranges = np.where(absdiff == 1)[0].reshape(-1, 2)
         return ranges
 
-    def sift_features(self):
+    def get_sift_features(self):
         gray = cv2.cvtColor(self.sub_img, cv2.COLOR_BGR2GRAY)
         sift = cv2.SIFT_create()
         return sift.detectAndCompute(gray, self.mask[self.y:self.y + self.h, self.x:self.x + self.w])
