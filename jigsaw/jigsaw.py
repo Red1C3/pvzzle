@@ -1,4 +1,5 @@
 import cv2
+import numpy as np
 from sklearn.cluster import KMeans
 
 from jigsaw.pieces_detection import extract_pieces
@@ -40,8 +41,20 @@ class Jigsaw:
                 match_points.append(point[0])
         k_means = KMeans(len(self.pieces), n_init=10)
         estimator = k_means.fit(match_points)
+        clusters = {i: [None, 0] for i in range(len(self.pieces))}
         for piece in self.pieces:
             matches_clusters = []
             for point in piece.hint_match_points:
                 matches_clusters.append(estimator.predict([point[0]])[0])
-            print(matches_clusters)
+            unique, counts = np.unique(matches_clusters, return_counts=True)
+            unique_counts = dict(zip(unique, counts))
+            for k, v in clusters.items():
+                if k not in unique_counts.keys():
+                    continue
+                if v[0] is None:
+                    v[0] = piece
+                    v[1] = unique_counts[k]
+                elif unique_counts[k] > v[1]:
+                    v[0] = piece
+                    v[1] = unique_counts[k]
+        return (clusters.values(), estimator.cluster_centers_)
