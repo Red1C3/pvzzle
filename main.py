@@ -12,6 +12,8 @@ hint = img_utils.read_img('./samples/lenna.png')
 
 jigsaw = Jigsaw(img, hint)
 
+jigsaw.cluster()
+
 pieces = pieces_detection.extract_pieces(img)
 
 pieces[0].type = PieceType.LEFT_UP
