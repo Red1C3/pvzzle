@@ -21,18 +21,22 @@ class Jigsaw:
                 kps1, des1 = piece.sift
                 kps2, des2 = self.hint_sift_features
 
-                matcher = cv2.DescriptorMatcher_create(cv2.DescriptorMatcher_FLANNBASED)
+                matcher = cv2.DescriptorMatcher_create(
+                    cv2.DescriptorMatcher_FLANNBASED)
                 knn_matches = matcher.knnMatch(des1, des2, 2)
                 ratio_threshold = 0.7
                 good_matches = []
                 for m, n in knn_matches:
                     if m.distance < ratio_threshold * n.distance:
                         good_matches.append(m)
-                good_matches = sorted(good_matches, key=lambda x: x.distance)[:10]  # Take only 10 best features
+                good_matches = sorted(good_matches, key=lambda x: x.distance)[
+                    :10]  # Take only 10 best features
                 hint_match_points = []
                 for match in good_matches:
-                    hint_match_points.append((kps2[match.trainIdx].pt, match.distance))
-                piece.hint_match_points = sorted(hint_match_points, key=lambda x: x[1])
+                    hint_match_points.append(
+                        (kps2[match.trainIdx].pt, match.distance))
+                piece.hint_match_points = sorted(
+                    hint_match_points, key=lambda x: x[1])
 
     def cluster(self):
         match_points = []
@@ -58,3 +62,14 @@ class Jigsaw:
                     v[0] = piece
                     v[1] = unique_counts[k]
         return clusters.values(), estimator.cluster_centers_
+
+    def clusters_img(self, offset=(100, 100)):
+        clusters = self.cluster()
+        cimg = np.zeros((self.hint.shape[0]*2, self.hint.shape[1]*2, 3),'uint8')
+        for piece, center in zip(clusters[0], clusters[1]):
+            piece = piece[0]
+            pimg = piece.sub_img
+            pshape = pimg.shape
+            cimg[round(center[1]-pshape[0]/2)+offset[0]:round(center[1]+pshape[0]/2)+offset[0],
+                 round(center[0]-pshape[1]/2)+offset[1]:round(center[0]+pshape[1]/2)+offset[1]] += pimg
+        return cimg
