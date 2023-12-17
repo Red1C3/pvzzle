@@ -12,7 +12,10 @@ hint = img_utils.read_img('./samples/lenna.png')
 
 jigsaw = Jigsaw(img, hint)
 
-jigsaw.cluster()
+clusters = jigsaw.cluster()
+
+for piece, center in zip(clusters[0], clusters[1]):
+    img_utils.display_img(piece[0].sub_img, str(center))
 
 pieces = pieces_detection.extract_pieces(img)
 

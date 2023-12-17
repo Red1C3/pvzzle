@@ -57,4 +57,4 @@ class Jigsaw:
                 elif unique_counts[k] > v[1]:
                     v[0] = piece
                     v[1] = unique_counts[k]
-        return (clusters.values(), estimator.cluster_centers_)
+        return clusters.values(), estimator.cluster_centers_
