@@ -31,7 +31,7 @@ class Jigsaw:
                     if m.distance < ratio_threshold * n.distance:
                         good_matches.append(m)
                 good_matches = sorted(good_matches, key=lambda x: x.distance)[
-                    :10]  # Take only 10 best features
+                               :10]  # Take only 10 best features
                 hint_match_points = []
                 for match in good_matches:
                     hint_match_points.append(
@@ -66,14 +66,14 @@ class Jigsaw:
 
     def clusters_img(self, offset=(100, 100)):
         clusters = self.cluster()
-        cimg = np.zeros((self.hint.shape[0]*2, self.hint.shape[1]*2, 3),'uint8')
+        cimg = np.zeros((self.hint.shape[0] * 2, self.hint.shape[1] * 2, 3), 'uint8')
         for piece, center in zip(clusters[0], clusters[1]):
             piece = piece[0]
             pimg = piece.sub_img
             pshape = pimg.shape
             center = (center[0] * 1.5, center[1] * 1.5)
-            cimg[round(center[1]-pshape[0]/2)+offset[0]:round(center[1]+pshape[0]/2)+offset[0],
-                 round(center[0]-pshape[1]/2)+offset[1]:round(center[0]+pshape[1]/2)+offset[1]] += pimg
+            cimg[round(center[1] - pshape[0] / 2) + offset[0]:round(center[1] + pshape[0] / 2) + offset[0],
+            round(center[0] - pshape[1] / 2) + offset[1]:round(center[0] + pshape[1] / 2) + offset[1]] += pimg
         return cimg
 
     def template_match(self):
@@ -89,14 +89,18 @@ class Jigsaw:
     def template_match2(self):
         solution = np.zeros(self.hint.shape, 'uint8')
         for piece in self.pieces:
-            h_shift = self.hint.shape[0] - piece.sub_img.shape[0]
-            w_shift = self.hint.shape[1] - piece.sub_img.shape[1]
+            test_img = piece.sub_img[
+                       piece.sub_img.shape[0] // 2 - piece.sub_img.shape[0] // 10:piece.sub_img.shape[0] // 2 +
+                                                                                  piece.sub_img.shape[0] // 10,
+                       piece.sub_img.shape[1] // 2 - piece.sub_img.shape[1] // 10:piece.sub_img.shape[1] // 2 +
+                                                                                  piece.sub_img.shape[1] // 10]
+            h_shift = self.hint.shape[0] - test_img.shape[0]
+            w_shift = self.hint.shape[1] - test_img.shape[1]
             for h in range(h_shift):
                 for w in range(w_shift):
-                    piece_img = np.zeros(self.hint.shape, 'uint8')
-                    piece_img[h:h + piece.sub_img.shape[0], w:w + piece.sub_img.shape[1]] = piece.sub_img
-                    xor_img = cv2.bitwise_xor(piece_img, self.hint)
-                    img_utils.display_img(xor_img)
+                    hint_piece_loc = self.hint[h:h + test_img.shape[0], w:w + test_img.shape[1]]
+                    xor_img = cv2.bitwise_xor(hint_piece_loc, test_img)
                     if not np.any(xor_img):
-                        solution += piece_img
+                        solution[h:h + test_img.shape[0], w:w + test_img.shape[1]] += test_img
+                        img_utils.display_img(solution)
         return solution
