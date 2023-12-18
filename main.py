@@ -7,7 +7,7 @@ hint = img_utils.read_img('./samples/lenna.png')
 jigsaw = Jigsaw(img, hint)
 
 # img_utils.display_img(jigsaw.clusters_img())
-img_utils.display_img(jigsaw.template_match2())
+img_utils.display_img(jigsaw.grid_match(10))
 
 
 

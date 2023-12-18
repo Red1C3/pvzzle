@@ -2,9 +2,11 @@ import cv2
 import numpy as np
 from sklearn.cluster import KMeans
 
+from grid_puzzle.grid import Grid
 from grid_puzzle.hint_quant_solver import HintQuantSolver
 from grid_puzzle.piece import Piece as GPiece
 from jigsaw.pieces_detection import extract_pieces
+from jigsaw.pieces_types import PieceType
 from jigsaw.set_piece_type import set_piece_type
 from utils import img_utils
 
@@ -20,7 +22,15 @@ class Jigsaw:
             sift = cv2.SIFT_create()
             self.hint_sift_features = sift.detectAndCompute(hint, None)
 
+            grid_width = 0
+            grid_height = 0
+
             for piece in self.pieces:
+                if piece.type == PieceType.LEFT_UP or piece.type == PieceType.CENTER_UP or piece.type == PieceType.RIGHT_UP:
+                    grid_width += 1
+                if piece.type == PieceType.LEFT_UP or piece.type == PieceType.CENTER_LEFT or piece.type == PieceType.LEFT_DOWN:
+                    grid_height += 1
+
                 kps1, des1 = piece.sift
                 kps2, des2 = self.hint_sift_features
 
@@ -40,6 +50,8 @@ class Jigsaw:
                         (kps2[match.trainIdx].pt, match.distance))
                 piece.hint_match_points = sorted(
                     hint_match_points, key=lambda x: x[1])
+
+            self.hint_grid = Grid(hint, (grid_width, grid_height), shuffle=False)
 
     def cluster(self):
         match_points = []
@@ -108,5 +120,35 @@ class Jigsaw:
                         best_match = ((h, h + test_img.shape[0], w, w + test_img.shape[1]), distance)
             if best_match[0] is not None:
                 solution[best_match[0][0]:best_match[0][1], best_match[0][2]:best_match[0][3]] += test_img
+                img_utils.display_img(solution)
+        return solution
+
+    def grid_match(self, jigsaw_piece_half_ratio):
+        solution = np.zeros(self.hint.shape, 'uint8')
+        for piece in self.pieces:
+            test_img = piece.sub_img[
+                       piece.sub_img.shape[0] // 2 - piece.sub_img.shape[0] // jigsaw_piece_half_ratio:
+                       piece.sub_img.shape[0] // 2 +
+                       piece.sub_img.shape[0] // jigsaw_piece_half_ratio,
+                       piece.sub_img.shape[1] // 2 - piece.sub_img.shape[1] // jigsaw_piece_half_ratio:
+                       piece.sub_img.shape[1] // 2 +
+                       piece.sub_img.shape[1] // jigsaw_piece_half_ratio]
+            test_img_piece = GPiece(test_img)
+            best_match = (None, np.inf)
+
+            hint_grid_size = self.hint_grid.size
+            hint_piece_size = self.hint_grid.piece_size
+            print('piece', flush=True)
+            for i in range(hint_grid_size[0]):
+                for j in range(hint_grid_size[1]):
+                    hint_piece = GPiece(self.hint_grid.get_piece(self.hint, (i, j), hint_piece_size))
+                    distance = HintQuantSolver.get_quantized_space_distance(test_img_piece, hint_piece)
+                    if distance < best_match[1]:
+                        best_match = ((i, j), distance)
+            if best_match[0] is not None:
+                solution[
+                best_match[0][1] * test_img.shape[0]:best_match[0][1] * test_img.shape[0] + test_img.shape[0],
+                best_match[0][0] * test_img.shape[1]:best_match[0][0] * test_img.shape[1] + test_img.shape[
+                    1]] += test_img
                 img_utils.display_img(solution)
         return solution
