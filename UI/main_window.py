@@ -4,7 +4,7 @@ from tkinter import filedialog
 import cv2
 import ctypes
 from jigsaw.pieces_detection import extract_pieces
-from jigsaw.solving import solve_on_contours
+from jigsaw.solving import make_solution_array, solve_on_contours
 import psutil
 
 
@@ -79,7 +79,10 @@ class MainWindow:
         left_up_piece, right_up_piece, left_down_piece, right_down_piece,center_up_pieces, center_down_pieces, center_left_pieces, center_right_pieces, center_pieces,w,h = extract_pieces(img, bgr_selected_color)
         total_pieces_count = 4 + len(center_up_pieces) + len(center_down_pieces) + len(center_left_pieces) + len(center_right_pieces) + len(center_pieces)
         self.pieces_len.config(text='Image processing complete. Pieces detected : ' + str(total_pieces_count))
-        solve_on_contours(left_up_piece, right_up_piece, left_down_piece, right_down_piece, center_up_pieces, center_down_pieces, center_left_pieces, center_right_pieces, center_pieces, w, h)
+        initial_w=240
+        initial_h=240
+        matched_pieces,grid_image = make_solution_array(center_left_pieces,center_up_pieces,initial_w=240,initial_h=240)
+        solve_on_contours(matched_pieces,grid_image,initial_w,initial_h,left_up_piece, right_up_piece, left_down_piece, right_down_piece, center_up_pieces, center_down_pieces, center_left_pieces, center_right_pieces, center_pieces, w, h)
         print("Image processing complete.")
 
         

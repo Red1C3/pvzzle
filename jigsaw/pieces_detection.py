@@ -48,7 +48,6 @@ def contour_splitter(piece):
     contour_points = piece.contour.reshape(-1, 2)
     len_contour_points=len(contour_points)
     closest_points = []
-    #Indexs= []
     left_side=[]
     bottom_side=[]
     right_side=[]
@@ -148,7 +147,6 @@ def extract_pieces(img,background_color):
                 left_down_piece.append(piece)
             elif piece.type == PieceType.RIGHT_DOWN:
                 right_down_piece.append(piece)
-            
             mask = None
             piece = None
     contours = None
