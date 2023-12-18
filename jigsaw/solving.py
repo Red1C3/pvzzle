@@ -3,8 +3,9 @@ import numpy as np
 import cv2
 
 def get_bump_direction_left_right(contour):
-    epsilon = 0.01 * cv2.arcLength(contour, True)
-    smoothed_contour = cv2.approxPolyDP(contour, epsilon, True)
+    closed = True
+    epsilon = 0.01 * cv2.arcLength(contour, closed)
+    smoothed_contour = cv2.approxPolyDP(contour, epsilon, closed)
     min_points_threshold = 3
     if len(smoothed_contour) < min_points_threshold:
         return 3
@@ -18,8 +19,9 @@ def get_bump_direction_left_right(contour):
         return 3
 
 def get_bump_direction_top_bottom(contour):
-    epsilon = 0.01 * cv2.arcLength(contour, True)
-    smoothed_contour = cv2.approxPolyDP(contour, epsilon, True)
+    closed = True
+    epsilon = 0.01 * cv2.arcLength(contour, closed)
+    smoothed_contour = cv2.approxPolyDP(contour, epsilon, closed)
     min_points_threshold = 3
     if len(smoothed_contour) < min_points_threshold:
         return 3
@@ -62,10 +64,14 @@ def display_answer(matched_pieces,row_count,column_count,grid_image,initial_w,in
     cv2.destroyAllWindows()
 
 def solve_on_contours(matched_pieces,grid_image,initial_w,initial_h,left_up_piece, right_up_piece, left_down_piece, right_down_piece, center_up_pieces, center_down_pieces, center_left_pieces, center_right_pieces, center_pieces, w, h):
-   
+    
     row_count = len(center_left_pieces)+2
     column_count = len(center_up_pieces)+2
-    
+    #best try : 0.55 0.45 True 1
+    contour_percent = 0.55
+    color_percent = 0.45
+    closed = True
+    comparing_way = 1
     #### CORNERS SOLVE ####
     
     matched_pieces[0][0] = left_up_piece[0]
@@ -77,25 +83,25 @@ def solve_on_contours(matched_pieces,grid_image,initial_w,initial_h,left_up_piec
     
     count = 0
     while count < column_count - 2 :
-        score = float('inf')
+        score = 100
         top_match = (float('inf'), None)
-        score_contour = float('inf')
-        score_color = float('inf')
+        score_contour = 100
+        score_color = 100
         for i, up_piece in enumerate(center_up_pieces):
             if get_bump_direction_left_right(matched_pieces[0][count].right_contour)==get_bump_direction_left_right(up_piece.left_contour):
-                epsilon = 0.1 * cv2.arcLength(matched_pieces[0][count].right_contour, True)
-                approx_left_piece_contour = cv2.approxPolyDP(matched_pieces[0][count].right_contour, epsilon, True)
-                epsilon = 0.1 * cv2.arcLength(up_piece.left_contour, True)
-                approx_compared_contour = cv2.approxPolyDP(up_piece.left_contour, epsilon, True)
-                score_contour = cv2.matchShapes(approx_left_piece_contour, approx_compared_contour, cv2.CONTOURS_MATCH_I1, 0.0)
+                epsilon = 0.1 * cv2.arcLength(matched_pieces[0][count].right_contour, closed)
+                approx_left_piece_contour = cv2.approxPolyDP(matched_pieces[0][count].right_contour, epsilon, closed)
+                epsilon = 0.1 * cv2.arcLength(up_piece.left_contour, closed)
+                approx_compared_contour = cv2.approxPolyDP(up_piece.left_contour, epsilon, closed)
+                score_contour = cv2.matchShapes(approx_left_piece_contour, approx_compared_contour, comparing_way, 0.0)
                 vec_left = matched_pieces[0][count].get_quantization_vector()
                 vec_right = up_piece.get_quantization_vector()
                 score_color = np.linalg.norm(np.array(vec_right) - np.array(vec_left))
-                if score_contour > 10 :
-                    score_contour = 10
-                if score_color > 10 : 
-                    score_color = 10
-                score = 0.55 * score_contour + 0.45 * score_color
+                if score_contour > 5 :
+                    score_contour = 5
+                if score_color > 5 : 
+                    score_color = 5
+                score = contour_percent * score_contour + color_percent * score_color
             if score < top_match[0]:
                 top_match = (score, up_piece)
         count += 1
@@ -117,19 +123,19 @@ def solve_on_contours(matched_pieces,grid_image,initial_w,initial_h,left_up_piec
         score_color = 100
         for i, down_piece in enumerate(center_down_pieces):
             if get_bump_direction_left_right(matched_pieces[row_count-1][count].right_contour)==get_bump_direction_left_right(down_piece.left_contour):
-                epsilon = 0.1 * cv2.arcLength(matched_pieces[row_count-1][count].right_contour, True)
-                approx_left_piece_contour = cv2.approxPolyDP(matched_pieces[row_count-1][count].right_contour, epsilon, True)
-                epsilon = 0.1 * cv2.arcLength(down_piece.left_contour, True)
-                approx_right_piece_contour = cv2.approxPolyDP(down_piece.left_contour, epsilon, True)
-                score_contour = cv2.matchShapes(approx_left_piece_contour, approx_right_piece_contour, cv2.CONTOURS_MATCH_I1, 0.0)
+                epsilon = 0.1 * cv2.arcLength(matched_pieces[row_count-1][count].right_contour, closed)
+                approx_left_piece_contour = cv2.approxPolyDP(matched_pieces[row_count-1][count].right_contour, epsilon, closed)
+                epsilon = 0.1 * cv2.arcLength(down_piece.left_contour, closed)
+                approx_right_piece_contour = cv2.approxPolyDP(down_piece.left_contour, epsilon, closed)
+                score_contour = cv2.matchShapes(approx_left_piece_contour, approx_right_piece_contour, comparing_way, 0.0)
                 vec_left = matched_pieces[row_count-1][count].get_quantization_vector()
                 vec_right = down_piece.get_quantization_vector()
                 score_color = np.linalg.norm(np.array(vec_right) - np.array(vec_left))
-                if score_contour > 10 :
-                    score_contour = 10
-                if score_color > 10 : 
-                    score_color = 10
-                score = 0.55 * score_contour + 0.45 * score_color
+                if score_contour > 5 :
+                    score_contour = 5
+                if score_color > 5 : 
+                    score_color = 5
+                score = contour_percent * score_contour + color_percent * score_color
             if score < top_match[0]:
                 top_match = (score, down_piece)        
         count += 1
@@ -151,19 +157,19 @@ def solve_on_contours(matched_pieces,grid_image,initial_w,initial_h,left_up_piec
         score_color = 100
         for i, left_piece in enumerate(center_left_pieces):
             if get_bump_direction_top_bottom(matched_pieces[count][0].bottom_contour)== get_bump_direction_top_bottom(left_piece.top_contour):
-                epsilon = 0.1 * cv2.arcLength(matched_pieces[count][0].bottom_contour, True)
-                approx_left_piece_contour = cv2.approxPolyDP(matched_pieces[count][0].bottom_contour, epsilon, True)
-                epsilon = 0.1 * cv2.arcLength(left_piece.top_contour, True)
-                approx_compared_contour = cv2.approxPolyDP(left_piece.top_contour, epsilon, True)
-                score_contour = cv2.matchShapes(approx_left_piece_contour, approx_compared_contour, cv2.CONTOURS_MATCH_I1, 0.0)
+                epsilon = 0.1 * cv2.arcLength(matched_pieces[count][0].bottom_contour, closed)
+                approx_left_piece_contour = cv2.approxPolyDP(matched_pieces[count][0].bottom_contour, epsilon, closed)
+                epsilon = 0.1 * cv2.arcLength(left_piece.top_contour, closed)
+                approx_compared_contour = cv2.approxPolyDP(left_piece.top_contour, epsilon, closed)
+                score_contour = cv2.matchShapes(approx_left_piece_contour, approx_compared_contour, comparing_way, 0.0)
                 vec_left = matched_pieces[count][0].get_quantization_vector()
                 vec_right = left_piece.get_quantization_vector()
                 score_color = np.linalg.norm(np.array(vec_right) - np.array(vec_left))
-                if score_contour > 10 :
-                    score_contour = 10
-                if score_color > 10 : 
-                    score_color = 10
-                score = 0.55 * score_contour + 0.45 * score_color
+                if score_contour > 5 :
+                    score_contour = 5
+                if score_color > 5 : 
+                    score_color = 5
+                score = contour_percent * score_contour + color_percent * score_color
             if score < top_match[0]:
                 top_match = (score, left_piece)
         count += 1
@@ -185,19 +191,19 @@ def solve_on_contours(matched_pieces,grid_image,initial_w,initial_h,left_up_piec
         score_color = 100
         for i, right_piece in enumerate(center_right_pieces):
             if get_bump_direction_top_bottom(matched_pieces[count][column_count-1].bottom_contour)== get_bump_direction_top_bottom(right_piece.top_contour):
-                epsilon = 0.1 * cv2.arcLength(matched_pieces[count][column_count-1].bottom_contour, True)
-                approx_right_piece_contour = cv2.approxPolyDP(matched_pieces[count][column_count-1].bottom_contour, epsilon, True)
-                epsilon = 0.1 * cv2.arcLength(right_piece.top_contour, True)
-                approx_compared_contour = cv2.approxPolyDP(right_piece.top_contour, epsilon, True)
-                score_contour = cv2.matchShapes(approx_right_piece_contour, approx_compared_contour, cv2.CONTOURS_MATCH_I1, 0.0)
+                epsilon = 0.1 * cv2.arcLength(matched_pieces[count][column_count-1].bottom_contour, closed)
+                approx_right_piece_contour = cv2.approxPolyDP(matched_pieces[count][column_count-1].bottom_contour, epsilon, closed)
+                epsilon = 0.1 * cv2.arcLength(right_piece.top_contour, closed)
+                approx_compared_contour = cv2.approxPolyDP(right_piece.top_contour, epsilon, closed)
+                score_contour = cv2.matchShapes(approx_right_piece_contour, approx_compared_contour, comparing_way, 0.0)
                 vec_left = matched_pieces[count][column_count-1].get_quantization_vector()
                 vec_right = right_piece.get_quantization_vector()
                 score_color = np.linalg.norm(np.array(vec_right) - np.array(vec_left))
-                if score_contour > 10 :
-                    score_contour = 10
-                if score_color > 10 : 
-                    score_color = 10
-                score = 0.55 * score_contour + 0.45 * score_color
+                if score_contour > 5 :
+                    score_contour = 5
+                if score_color > 5 : 
+                    score_color = 5
+                score = contour_percent * score_contour + color_percent * score_color
             if score < top_match[0]:
                 top_match = (score, right_piece)
         count += 1
@@ -212,7 +218,7 @@ def solve_on_contours(matched_pieces,grid_image,initial_w,initial_h,left_up_piec
             #print(f"Warning: {top_match[1]} not found in center_right_pieces")
     
     ### CENTER LINES with left bottom compare ###
-    #done = True
+    #done = closed
     center_pieces_copy = center_pieces.copy()
     main_counter = 1
     while main_counter < row_count-1 :
@@ -227,22 +233,22 @@ def solve_on_contours(matched_pieces,grid_image,initial_w,initial_h,left_up_piec
                     if get_bump_direction_top_bottom(matched_pieces[main_counter-1][inside_counter+1].bottom_contour)== get_bump_direction_top_bottom(center_piece.top_contour):
                         print(f'HERE {i}')
                         #score 1 for left contour
-                        epsilon = 0.1 * cv2.arcLength(matched_pieces[main_counter][inside_counter].right_contour, True)
-                        approx_left_piece_contour = cv2.approxPolyDP(matched_pieces[main_counter][inside_counter].right_contour, epsilon, True)
-                        epsilon = 0.1 * cv2.arcLength(center_piece.left_contour, True)
-                        approx_left_compared_contour = cv2.approxPolyDP(center_piece.left_contour, epsilon, True)
-                        score1 = cv2.matchShapes(approx_left_piece_contour, approx_left_compared_contour, cv2.CONTOURS_MATCH_I1, 0.0)
+                        epsilon = 0.1 * cv2.arcLength(matched_pieces[main_counter][inside_counter].right_contour, closed)
+                        approx_left_piece_contour = cv2.approxPolyDP(matched_pieces[main_counter][inside_counter].right_contour, epsilon, closed)
+                        epsilon = 0.1 * cv2.arcLength(center_piece.left_contour, closed)
+                        approx_left_compared_contour = cv2.approxPolyDP(center_piece.left_contour, epsilon, closed)
+                        score1 = cv2.matchShapes(approx_left_piece_contour, approx_left_compared_contour, comparing_way, 0.0)
                         #score 2 for bottom contour
-                        epsilon = 0.1 * cv2.arcLength(matched_pieces[main_counter-1][inside_counter+1].bottom_contour, True)
-                        approx_bottom_piece_contour = cv2.approxPolyDP(matched_pieces[main_counter-1][inside_counter+1].bottom_contour, epsilon, True)
-                        epsilon = 0.1 * cv2.arcLength(center_piece.top_contour, True)
-                        approx_bottom_compared_contour = cv2.approxPolyDP(center_piece.top_contour, epsilon, True)
-                        score2 = cv2.matchShapes(approx_bottom_piece_contour, approx_bottom_compared_contour, cv2.CONTOURS_MATCH_I1, 0.0)
+                        epsilon = 0.1 * cv2.arcLength(matched_pieces[main_counter-1][inside_counter+1].bottom_contour, closed)
+                        approx_bottom_piece_contour = cv2.approxPolyDP(matched_pieces[main_counter-1][inside_counter+1].bottom_contour, epsilon, closed)
+                        epsilon = 0.1 * cv2.arcLength(center_piece.top_contour, closed)
+                        approx_bottom_compared_contour = cv2.approxPolyDP(center_piece.top_contour, epsilon, closed)
+                        score2 = cv2.matchShapes(approx_bottom_piece_contour, approx_bottom_compared_contour, comparing_way, 0.0)
                         ##total contour score
-                        if score1 > 10 :
-                            score1 = 10
-                        if score2 > 10 :
-                            score2 = 10
+                        if score1 > 5 :
+                            score1 = 5
+                        if score2 > 5 :
+                            score2 = 5
                         score_contour = (score1 + score2)/2
                         vec_left = matched_pieces[main_counter][inside_counter].get_quantization_vector()
                         vec_right = center_piece.get_quantization_vector()
@@ -251,7 +257,9 @@ def solve_on_contours(matched_pieces,grid_image,initial_w,initial_h,left_up_piec
                         vec_down = center_piece.get_quantization_vector()
                         score_color2 = np.linalg.norm(np.array(vec_up) - np.array(vec_down))
                         score_color = (score_color1 + score_color2)/2
-                        score = 0.55 * score_contour + 0.45 * score_color
+                        if score_color > 5 :
+                            score_color = 5
+                        score = contour_percent * score_contour + color_percent * score_color
                     if score < top_match[0]:
                         top_match = (score, center_piece)
             inside_counter +=1
