@@ -7,7 +7,8 @@ class HintQuantSolver:
     def __init__(self, grid: Grid):
         self.grid = grid
 
-    def get_quantized_space_distance(self, piece1, piece2, levels=8):
+    @staticmethod
+    def get_quantized_space_distance(piece1, piece2, levels=8):
         vec1 = np.array(piece1.get_quantization_vector(levels))
         vec2 = np.array(piece2.get_quantization_vector(levels))
         return np.linalg.norm(vec1 - vec2)
@@ -17,7 +18,7 @@ class HintQuantSolver:
         for piece in self.grid.pieces:
             piece_matches = {}
             for coordinates, hint_piece in self.grid.hint_pieces.items():
-                piece_matches[coordinates] = self.get_quantized_space_distance(piece, hint_piece, levels)
+                piece_matches[coordinates] = HintQuantSolver.get_quantized_space_distance(piece, hint_piece, levels)
             piece_matches = {k: v for k, v in sorted(piece_matches.items(), key=lambda item: item[1], reverse=False)}
             solution[list(piece_matches.keys())[0]] = piece
 

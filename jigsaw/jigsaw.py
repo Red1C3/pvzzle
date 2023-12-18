@@ -2,6 +2,8 @@ import cv2
 import numpy as np
 from sklearn.cluster import KMeans
 
+from grid_puzzle.hint_quant_solver import HintQuantSolver
+from grid_puzzle.piece import Piece as GPiece
 from jigsaw.pieces_detection import extract_pieces
 from jigsaw.set_piece_type import set_piece_type
 from utils import img_utils
@@ -96,11 +98,15 @@ class Jigsaw:
                                                                                   piece.sub_img.shape[1] // 10]
             h_shift = self.hint.shape[0] - test_img.shape[0]
             w_shift = self.hint.shape[1] - test_img.shape[1]
+            test_img_piece = GPiece(test_img)
+            best_match = (None, np.inf)
             for h in range(h_shift):
                 for w in range(w_shift):
                     hint_piece_loc = self.hint[h:h + test_img.shape[0], w:w + test_img.shape[1]]
-                    xor_img = cv2.bitwise_xor(hint_piece_loc, test_img)
-                    if not np.any(xor_img):
-                        solution[h:h + test_img.shape[0], w:w + test_img.shape[1]] += test_img
-                        img_utils.display_img(solution)
+                    distance = HintQuantSolver.get_quantized_space_distance(test_img_piece, GPiece(hint_piece_loc))
+                    if distance < best_match[1]:
+                        best_match = ((h, h + test_img.shape[0], w, w + test_img.shape[1]), distance)
+            if best_match[0] is not None:
+                solution[best_match[0][0]:best_match[0][1], best_match[0][2]:best_match[0][3]] += test_img
+                img_utils.display_img(solution)
         return solution
