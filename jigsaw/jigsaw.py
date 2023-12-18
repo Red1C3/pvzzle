@@ -138,7 +138,6 @@ class Jigsaw:
 
             hint_grid_size = self.hint_grid.size
             hint_piece_size = self.hint_grid.piece_size
-            print('piece', flush=True)
             for i in range(hint_grid_size[0]):
                 for j in range(hint_grid_size[1]):
                     hint_piece = GPiece(self.hint_grid.get_piece(self.hint, (i, j), hint_piece_size))
@@ -146,9 +145,8 @@ class Jigsaw:
                     if distance < best_match[1]:
                         best_match = ((i, j), distance)
             if best_match[0] is not None:
-                solution[
-                best_match[0][1] * test_img.shape[0]:best_match[0][1] * test_img.shape[0] + test_img.shape[0],
-                best_match[0][0] * test_img.shape[1]:best_match[0][0] * test_img.shape[1] + test_img.shape[
-                    1]] += test_img
-                img_utils.display_img(solution)
+                center = (best_match[0][0] * hint_piece_size[0] + hint_piece_size[0] // 2,
+                          best_match[0][1] * hint_piece_size[1] + hint_piece_size[1] // 2)
+                solution[center[1] - test_img.shape[0] // 2:center[1] + test_img.shape[0] // 2,
+                center[0] - test_img.shape[1] // 2:center[0] + test_img.shape[1] // 2] += test_img
         return solution
