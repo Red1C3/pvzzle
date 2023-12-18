@@ -105,15 +105,16 @@ def solve_on_contours(matched_pieces,grid_image,initial_w,initial_h,left_up_piec
             center_up_pieces.remove(top_match[1])
         else:
             print(f"Warning: {top_match[1]} not found in center_up_pieces")
+            break
     
     #### CENTER_DOWN ####    
     
     count = 0
     while count < column_count-2 :
-        score = float('inf')
+        score = 100
         top_match = (float('inf'), None)
-        score_contour = float('inf')
-        score_color = float('inf')
+        score_contour = 100
+        score_color = 100
         for i, down_piece in enumerate(center_down_pieces):
             if get_bump_direction_left_right(matched_pieces[row_count-1][count].right_contour)==get_bump_direction_left_right(down_piece.left_contour):
                 epsilon = 0.1 * cv2.arcLength(matched_pieces[row_count-1][count].right_contour, True)
@@ -138,15 +139,16 @@ def solve_on_contours(matched_pieces,grid_image,initial_w,initial_h,left_up_piec
             center_down_pieces.remove(top_match[1])
         else:
             print(f"Warning: {top_match[1]} not found in center_down_pieces")
+            break
     
     #### LEFT COLOMN ####
 
     count = 0
     while count < row_count-2 :
-        score = float('inf')
+        score = 100
         top_match = (float('inf'), None)
-        score_contour = float('inf')
-        score_color = float('inf')
+        score_contour = 100
+        score_color = 100
         for i, left_piece in enumerate(center_left_pieces):
             if get_bump_direction_top_bottom(matched_pieces[count][0].bottom_contour)== get_bump_direction_top_bottom(left_piece.top_contour):
                 epsilon = 0.1 * cv2.arcLength(matched_pieces[count][0].bottom_contour, True)
@@ -171,15 +173,16 @@ def solve_on_contours(matched_pieces,grid_image,initial_w,initial_h,left_up_piec
             center_left_pieces.remove(top_match[1])
         else:
             print(f"Warning: {top_match[1]} not found in center_left_pieces")
+            break
     
     #### Right COLOMN ####
 
     count = 0
     while count < row_count-2 :
-        score = float('inf')
+        score = 100
         top_match = (float('inf'), None)
-        score_contour = float('inf')
-        score_color = float('inf')
+        score_contour = 100
+        score_color = 100
         for i, right_piece in enumerate(center_right_pieces):
             if get_bump_direction_top_bottom(matched_pieces[count][column_count-1].bottom_contour)== get_bump_direction_top_bottom(right_piece.top_contour):
                 epsilon = 0.1 * cv2.arcLength(matched_pieces[count][column_count-1].bottom_contour, True)
@@ -203,23 +206,26 @@ def solve_on_contours(matched_pieces,grid_image,initial_w,initial_h,left_up_piec
         if top_match[1] in center_right_pieces:
             center_right_pieces.remove(top_match[1])
         else:
-            print(f"Warning: {top_match[1]} not found in center_right_pieces")
+            print('ERROR, NOT SOLVED in center_right_pieces!')
+            break
+        #else:
+            #print(f"Warning: {top_match[1]} not found in center_right_pieces")
     
     ### CENTER LINES with left bottom compare ###
     #done = True
     center_pieces_copy = center_pieces.copy()
     main_counter = 1
     while main_counter < row_count-1 :
-        score = float('inf')
         inside_counter = 0
         while inside_counter < column_count-2 :  
-            score = float('inf')
+            score = 100
             top_match = (float('inf'), None)
-            score_contour = float('inf')
-            score_color = float('inf')
+            score_contour = 100
+            score_color = 100
             for i, center_piece in enumerate(center_pieces_copy):
                 if get_bump_direction_left_right(matched_pieces[main_counter][inside_counter].right_contour)==get_bump_direction_left_right(center_piece.left_contour):
                     if get_bump_direction_top_bottom(matched_pieces[main_counter-1][inside_counter+1].bottom_contour)== get_bump_direction_top_bottom(center_piece.top_contour):
+                        print(f'HERE {i}')
                         #score 1 for left contour
                         epsilon = 0.1 * cv2.arcLength(matched_pieces[main_counter][inside_counter].right_contour, True)
                         approx_left_piece_contour = cv2.approxPolyDP(matched_pieces[main_counter][inside_counter].right_contour, epsilon, True)
@@ -245,7 +251,7 @@ def solve_on_contours(matched_pieces,grid_image,initial_w,initial_h,left_up_piec
                         vec_down = center_piece.get_quantization_vector()
                         score_color2 = np.linalg.norm(np.array(vec_up) - np.array(vec_down))
                         score_color = (score_color1 + score_color2)/2
-                        score = 0.6 * score_contour + 0.4 * score_color
+                        score = 0.55 * score_contour + 0.45 * score_color
                     if score < top_match[0]:
                         top_match = (score, center_piece)
             inside_counter +=1
