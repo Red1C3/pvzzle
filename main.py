@@ -1,3 +1,6 @@
+import tkinter as tk
+
+from UI.mainWindow import MainWindow
 from grid_puzzle.greedy_solver import GreedySolver
 from grid_puzzle.grid import Grid
 from grid_puzzle.hint_quant_solver import HintQuantSolver
@@ -60,12 +63,17 @@ def jigsaw_with_hint(img_path, hint_path, solver_type):
             img_utils.display_img(jigsaw.template_match2(), 'Solution')
 
 
-img_path = './samples/lenna.png'
-hint_path = './samples/lenna.png'
+# img_path = './samples/lenna.png'
+# hint_path = './samples/lenna.png'
 
 # grid_without_hint(size=(5,5),img_path=img_path)
 # grid_with_hint(size=(5,5),img_path=img_path,hint_path=None,solver_type="Q")
 # jigsaw_with_hint(img_path=img_path,hint_path=hint_path,solver_type='clusters')
 
 
-img_utils.close_all_windows()
+# img_utils.close_all_windows()
+
+
+root = tk.Tk()
+main_window = MainWindow(root)
+main_window.mainloop()
