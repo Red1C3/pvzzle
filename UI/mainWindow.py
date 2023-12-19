@@ -1,5 +1,11 @@
 import tkinter as tk
 import tkinter.filedialog
+import cv2
+from utils import img_utils
+from grid_puzzle.grid import Grid
+from grid_puzzle.hint_solver import HintSolver
+from grid_puzzle.hint_quant_solver import HintQuantSolver
+from PIL import Image, ImageTk
 
 
 class MainWindow(tk.Frame):
@@ -15,6 +21,8 @@ class MainWindow(tk.Frame):
         self.grid_height_var = tk.IntVar(value=0)
         self.selected_hint_filename = ''
         self.selected_algorithm = tk.StringVar()
+        # PhotoImage are garbage collected so we're preventing that here
+        self.images = [None, None, None]
 
     def create_type_options_menu(self):
         options = [
@@ -43,7 +51,7 @@ class MainWindow(tk.Frame):
 
         if selection_type == 'Grid With Hint' or selection_type == 'Grid Without Hint':
             shuffle_button = tk.Radiobutton(
-                self, text="Shuffle", variable=self.shuffle_var, indicatoron=False,value=True)
+                self, text="Shuffle", variable=self.shuffle_var, indicatoron=False, value=True)
             shuffle_button.pack()
             tk.Label(self, text="Enter Grid Width:").pack()
             grid_width = tk.Entry(self, textvariable=self.grid_width_var)
@@ -82,9 +90,40 @@ class MainWindow(tk.Frame):
             tk.Button(self, text='Solve').pack()
 
     def solve_grid_with_hint(self):
-        print(self.selected_img_filename)
-        print(self.selected_hint_filename)
-        print(self.selected_algorithm.get())
-        print(self.shuffle_var.get())
-        print(self.grid_width_var.get())
-        print(self.grid_height_var.get())
+        img_path = self.selected_img_filename
+        hint_path = self.selected_hint_filename
+        shuffle = self.shuffle_var.get()
+        solver_type = self.selected_algorithm.get()
+        size = (self.grid_width_var.get(), self.grid_height_var.get())
+        img = img_utils.read_img(img_path)
+        if hint_path == '':
+            hint = img
+        else:
+            hint = img_utils.read_img(hint_path)
+
+        grid = Grid(img, size, shuffle=shuffle, hint=hint)
+
+        grid_img = grid.get_pieces_img()
+
+        if solver_type == "SIFT":
+            solver = HintSolver(grid)
+        elif solver_type == "Color Quantization":
+            solver = HintQuantSolver(grid)
+        solutions = solver.solve()
+
+        solution = solver.get_solution_img(solutions[0])
+
+        self.build_images_ui(['Grid', 'Hint', 'Solution'], [
+                             grid_img, hint, solution])
+
+    def build_images_ui(self, labels, images):
+        for widget in self.winfo_children():
+            widget.destroy()
+        for i in range(len(labels)):
+            img = images[i]
+            b, g, r = cv2.split(img)
+            img = cv2.merge((r, g, b))
+            img = Image.fromarray(img)
+            self.images[i] = ImageTk.PhotoImage(image=img)
+            tk.Label(self, image=self.images[i]).grid(column=i, row=0)
+            tk.Label(self, text=labels[i]).grid(column=i, row=1)
