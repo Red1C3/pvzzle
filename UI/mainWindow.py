@@ -15,6 +15,7 @@ from utils import img_utils
 class MainWindow(tk.Frame):
     def __init__(self, master):
         super().__init__(master)
+        self.winfo_toplevel().title('PVZZLE')
         self.pack()
         self.drop_down_selected = self.create_type_options_menu()
         next_button = tk.Button(
