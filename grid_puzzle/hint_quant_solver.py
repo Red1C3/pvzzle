@@ -21,6 +21,7 @@ class HintQuantSolver:
                 piece_matches[coordinates] = HintQuantSolver.get_quantized_space_distance(piece, hint_piece, levels)
             piece_matches = {k: v for k, v in sorted(piece_matches.items(), key=lambda item: item[1], reverse=False)}
             solution[list(piece_matches.keys())[0]] = piece
+            del self.grid.hint_pieces[list(piece_matches.keys())[0]]
 
         return [solution]
 
