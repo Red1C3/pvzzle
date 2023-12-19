@@ -8,6 +8,7 @@ from grid_puzzle.greedy_solver import GreedySolver
 from grid_puzzle.grid import Grid
 from grid_puzzle.hint_quant_solver import HintQuantSolver
 from grid_puzzle.hint_solver import HintSolver
+from jigsaw.jigsaw import Jigsaw
 from utils import img_utils
 
 
@@ -89,7 +90,7 @@ class MainWindow(tk.Frame):
             algorithms_drop_down = tk.OptionMenu(
                 self, self.selected_algorithm, *algorithms)
             algorithms_drop_down.pack()
-            tk.Button(self, text='Solve').pack()
+            tk.Button(self, text='Solve', command=self.solve_jigsaw_with_hint).pack()
 
     def solve_grid_with_hint(self):
         img_path = self.selected_img_filename
@@ -136,6 +137,25 @@ class MainWindow(tk.Frame):
         solution = solver.get_solution_img(solutions[0])
 
         self.build_images_ui(['Grid', 'Solution'], [grid_img, solution])
+
+    def solve_jigsaw_with_hint(self):
+        img_path = self.selected_img_filename
+        hint_path = self.selected_hint_filename
+        solver_type = self.selected_algorithm.get()
+        img = img_utils.read_img(img_path)
+        hint = img_utils.read_img(hint_path)
+
+        jigsaw = Jigsaw(img, hint)
+
+        match solver_type:
+            case 'Clustering':
+                solution = jigsaw.clusters_img()
+            case 'Grid Quantization':
+                solution = jigsaw.grid_match(5)
+            case 'Kernel Quantization':  # Takes a lot of time
+                solution = jigsaw.template_match2()
+
+        self.build_images_ui(['Jigsaw Pieces', 'Hint', 'Solution'], [img, hint, solution])
 
     def build_images_ui(self, labels, images):
         for widget in self.winfo_children():
