@@ -1,11 +1,14 @@
 import tkinter as tk
 import tkinter.filedialog
+
 import cv2
-from utils import img_utils
-from grid_puzzle.grid import Grid
-from grid_puzzle.hint_solver import HintSolver
-from grid_puzzle.hint_quant_solver import HintQuantSolver
 from PIL import Image, ImageTk
+
+from grid_puzzle.greedy_solver import GreedySolver
+from grid_puzzle.grid import Grid
+from grid_puzzle.hint_quant_solver import HintQuantSolver
+from grid_puzzle.hint_solver import HintSolver
+from utils import img_utils
 
 
 class MainWindow(tk.Frame):
@@ -60,9 +63,8 @@ class MainWindow(tk.Frame):
             grid_height = tk.Entry(self, textvariable=self.grid_height_var)
             grid_height.pack()
             if selection_type == 'Grid Without Hint':
-                tk.Button(self, text='Solve').pack()
+                tk.Button(self, text='Solve', command=self.solve_grid_without_hint).pack()
             else:
-
                 def set_selected_hint_filename():
                     self.selected_hint_filename = tk.filedialog.askopenfilename()
 
@@ -115,6 +117,25 @@ class MainWindow(tk.Frame):
 
         self.build_images_ui(['Grid', 'Hint', 'Solution'], [
                              grid_img, hint, solution])
+
+    def solve_grid_without_hint(self):
+        img_path = self.selected_img_filename
+        shuffle = self.shuffle_var.get()
+        size = (self.grid_width_var.get(), self.grid_height_var.get())
+        img = img_utils.read_img(img_path)
+
+        grid = Grid(img, size, shuffle=shuffle, hint=None)
+
+        grid_img = grid.get_pieces_img()
+
+        grid.process_all_pieces()
+        grid.clean_up_dicts()
+
+        solver = GreedySolver(grid)
+        solutions = solver.solve()
+        solution = solver.get_solution_img(solutions[0])
+
+        self.build_images_ui(['Grid', 'Solution'], [grid_img, solution])
 
     def build_images_ui(self, labels, images):
         for widget in self.winfo_children():
