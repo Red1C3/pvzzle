@@ -1,4 +1,4 @@
-from jigsaw.piece import Piece
+from jigsaw_no_h.piece import Piece
 import numpy as np
 import cv2
 

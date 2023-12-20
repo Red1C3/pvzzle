@@ -3,12 +3,12 @@ import tkinter as tk
 from tkinter import filedialog
 import cv2
 import ctypes
-from jigsaw.pieces_detection import extract_pieces
-from jigsaw.solving import make_solution_array, solve_on_contours
+from jigsaw_no_h.pieces_detection import extract_pieces
+from jigsaw_no_h.solving import make_solution_array, solve_on_contours
 import psutil
 
 
-class MainWindow:
+class JigsawNoHint:
     def __init__(self, root):
         self.root = root
         self.root.title("Main Window")

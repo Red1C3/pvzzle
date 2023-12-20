@@ -1,7 +1,7 @@
 
 import copy
 import cv2
-from jigsaw.piece import Piece, PieceType
+from jigsaw_no_h.piece import Piece, PieceType
 import numpy as np
 
 
