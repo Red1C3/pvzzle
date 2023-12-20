@@ -5,7 +5,7 @@ from sklearn.cluster import KMeans
 from grid_puzzle.grid import Grid
 from grid_puzzle.hint_quant_solver import HintQuantSolver
 from grid_puzzle.piece import Piece as GPiece
-from jigsaw.pieces_detection import extract_pieces,extract_pieces_bbg
+from jigsaw.pieces_detection import extract_pieces_bbg
 from jigsaw.pieces_types import PieceType
 from jigsaw.set_piece_type import set_piece_type
 from utils import img_utils
@@ -120,7 +120,6 @@ class Jigsaw:
                         best_match = ((h, h + test_img.shape[0], w, w + test_img.shape[1]), distance)
             if best_match[0] is not None:
                 solution[best_match[0][0]:best_match[0][1], best_match[0][2]:best_match[0][3]] += test_img
-                img_utils.display_img(solution)
         return solution
 
     def grid_match(self, jigsaw_piece_half_ratio):
