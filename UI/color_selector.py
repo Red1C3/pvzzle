@@ -1,6 +1,6 @@
 import tkinter as tk
 from PIL import Image, ImageTk,ImageFilter
-from UI.main_window import MainWindow 
+from UI.jigsaw_no_hint import JigsawNoHint
 
 class ColorSelector:
     def __init__(self, root, img_path):
