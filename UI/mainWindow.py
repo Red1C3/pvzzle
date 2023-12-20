@@ -3,6 +3,7 @@ import tkinter.filedialog
 
 import cv2
 from PIL import Image, ImageTk
+from screeninfo import get_monitors
 
 from jigsaw.pieces_detection import extract_pieces
 from jigsaw.solving import solve_on_contours
@@ -32,6 +33,7 @@ class MainWindow(tk.Frame):
         self.selected_algorithm = tk.StringVar()
         # PhotoImage are garbage collected so we're preventing that here
         self.images = [None, None, None]
+        self.monitor_width = get_monitors()[0].width
 
     def create_type_options_menu(self):
         options = [
@@ -50,7 +52,7 @@ class MainWindow(tk.Frame):
 
     def transit_to_image_selection(self):
         selection_type = self.drop_down_selected.get()
-            
+
         for widget in self.winfo_children():
             widget.destroy()
 
@@ -62,12 +64,12 @@ class MainWindow(tk.Frame):
             if selection_type == 'Grid With Hint' or selection_type == 'Grid Without Hint':
                 counter = Counter(self.selected_img_filename)
                 (row,col)=counter.main()
-                
+
                 grid_width.delete(0, tk.END)
                 grid_width.insert(0, row)
 
                 grid_height.delete(0, tk.END)
-                grid_height.insert(0, col)          
+                grid_height.insert(0, col)
 
         tk.Button(self, text='Select an image',
                   command=set_selected_img_filename).pack()
@@ -83,7 +85,8 @@ class MainWindow(tk.Frame):
             grid_height = tk.Entry(self, textvariable=self.grid_height_var)
             grid_height.pack()
             if selection_type == 'Grid Without Hint':
-                tk.Button(self, text='Solve', command=self.solve_grid_without_hint).pack()
+                tk.Button(self, text='Solve',
+                          command=self.solve_grid_without_hint).pack()
             else:
                 def set_selected_hint_filename():
                     self.selected_hint_filename = tk.filedialog.askopenfilename()
@@ -109,7 +112,8 @@ class MainWindow(tk.Frame):
             algorithms_drop_down = tk.OptionMenu(
                 self, self.selected_algorithm, *algorithms)
             algorithms_drop_down.pack()
-            tk.Button(self, text='Solve', command=self.solve_jigsaw_with_hint).pack()
+            tk.Button(self, text='Solve',
+                      command=self.solve_jigsaw_with_hint).pack()
 
     def solve_grid_with_hint(self):
         img_path = self.selected_img_filename
@@ -174,7 +178,8 @@ class MainWindow(tk.Frame):
             case 'Kernel Quantization':  # Takes a lot of time
                 solution = jigsaw.template_match2()
 
-        self.build_images_ui(['Jigsaw Pieces', 'Hint', 'Solution'], [img, hint, solution])
+        self.build_images_ui(['Jigsaw Pieces', 'Hint', 'Solution'], [
+                             img, hint, solution])
 
     def build_images_ui(self, labels, images):
         for widget in self.winfo_children():
@@ -184,10 +189,13 @@ class MainWindow(tk.Frame):
             b, g, r = cv2.split(img)
             img = cv2.merge((r, g, b))
             img = Image.fromarray(img)
+            img_ratio = img.height/img.width
+            img = img.resize(
+                (self.monitor_width//len(images), round(img_ratio*(self.monitor_width//len(images)))))
             self.images[i] = ImageTk.PhotoImage(image=img)
             tk.Label(self, image=self.images[i]).grid(column=i, row=0)
             tk.Label(self, text=labels[i]).grid(column=i, row=1)
-        
+
     def jigsaw_without_hint(self):
         self.image_button = tk.Button(self, text="Choose Image", command=self.choose_image)
         self.image_button.pack(padx=10, pady=(20, 10))  # Adjust pady for top padding
