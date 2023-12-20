@@ -51,15 +51,15 @@ class MainWindow(tk.Frame):
 
         def set_selected_img_filename():
             self.selected_img_filename = tk.filedialog.askopenfilename()
-            
-            counter = Counter(self.selected_img_filename)
-            (row,col)=counter.main()
+            if selection_type == 'Grid With Hint' or selection_type == 'Grid Without Hint':
+                counter = Counter(self.selected_img_filename)
+                (row,col)=counter.main()
 
-            grid_width.delete(0, tk.END)
-            grid_width.insert(0, row)
+                grid_width.delete(0, tk.END)
+                grid_width.insert(0, row)
 
-            grid_height.delete(0, tk.END)
-            grid_height.insert(0, col)          
+                grid_height.delete(0, tk.END)
+                grid_height.insert(0, col)          
 
         tk.Button(self, text='Select an image',
                   command=set_selected_img_filename).pack()
