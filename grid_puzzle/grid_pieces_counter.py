@@ -95,17 +95,15 @@ class CountGridPieces:
         cv2.waitKey(0)
         cv2.destroyAllWindows()
 
-
-# Example Usage:
-if __name__ == "__main__":
-    image_path = 'samples/shuffled-8.PNG'
-    counter = CountGridPieces(image_path)
-    counter.read_image()
-    counter.preprocess_image()
-    counter.filter_lines()
-    counter.separate_lines()
-    counter.calculate_distances()
-    counter.count_pieces()
-    counter.display_result()
-    counter.draw_lines()
-    counter.show_image()
+class Counter():
+    def __init__(self,impath):
+        self.image_path=impath
+    def main(self):
+        counter = CountGridPieces(self.image_path)
+        counter.read_image()
+        counter.preprocess_image()
+        counter.filter_lines()
+        counter.separate_lines()
+        counter.calculate_distances()
+        counter.count_pieces()
+        return (round(counter.vertical_result),round(counter.horizontal_result))
