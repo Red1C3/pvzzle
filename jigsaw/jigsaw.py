@@ -5,7 +5,7 @@ from sklearn.cluster import KMeans
 from grid_puzzle.grid import Grid
 from grid_puzzle.hint_quant_solver import HintQuantSolver
 from grid_puzzle.piece import Piece as GPiece
-from jigsaw.pieces_detection import extract_pieces
+from jigsaw.pieces_detection import extract_pieces,extract_pieces_bbg
 from jigsaw.pieces_types import PieceType
 from jigsaw.set_piece_type import set_piece_type
 from utils import img_utils
@@ -13,7 +13,7 @@ from utils import img_utils
 
 class Jigsaw:
     def __init__(self, colored_img, hint=None):
-        self.pieces = extract_pieces(colored_img)
+        self.pieces = extract_pieces_bbg(colored_img)
         for piece in self.pieces:
             set_piece_type(piece)
             piece.sift = piece.sift_features()
