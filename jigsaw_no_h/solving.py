@@ -214,8 +214,6 @@ def solve_on_contours(matched_pieces,grid_image,initial_w,initial_h,left_up_piec
         else:
             print('ERROR, NOT SOLVED in center_right_pieces!')
             break
-        #else:
-            #print(f"Warning: {top_match[1]} not found in center_right_pieces")
     
     ### CENTER LINES with left bottom compare ###
     #done = closed
@@ -231,7 +229,6 @@ def solve_on_contours(matched_pieces,grid_image,initial_w,initial_h,left_up_piec
             for i, center_piece in enumerate(center_pieces_copy):
                 if get_bump_direction_left_right(matched_pieces[main_counter][inside_counter].right_contour)==get_bump_direction_left_right(center_piece.left_contour):
                     if get_bump_direction_top_bottom(matched_pieces[main_counter-1][inside_counter+1].bottom_contour)== get_bump_direction_top_bottom(center_piece.top_contour):
-                        print(f'HERE {i}')
                         #score 1 for left contour
                         epsilon = 0.1 * cv2.arcLength(matched_pieces[main_counter][inside_counter].right_contour, closed)
                         approx_left_piece_contour = cv2.approxPolyDP(matched_pieces[main_counter][inside_counter].right_contour, epsilon, closed)
