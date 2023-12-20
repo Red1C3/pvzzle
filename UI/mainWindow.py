@@ -5,16 +5,15 @@ import cv2
 from PIL import Image, ImageTk
 from screeninfo import get_monitors
 
-from jigsaw.pieces_detection import extract_pieces
-from jigsaw.solving import solve_on_contours
-
 from grid_puzzle.greedy_solver import GreedySolver
 from grid_puzzle.grid import Grid
+from grid_puzzle.grid_pieces_counter import Counter
 from grid_puzzle.hint_quant_solver import HintQuantSolver
 from grid_puzzle.hint_solver import HintSolver
 from jigsaw.jigsaw import Jigsaw
+from jigsaw.pieces_detection import extract_pieces
+from jigsaw.solving import solve_on_contours
 from utils import img_utils
-from grid_puzzle.grid_pieces_counter import Counter
 
 
 class MainWindow(tk.Frame):
@@ -218,7 +217,7 @@ class MainWindow(tk.Frame):
         self.selected_color = None
 
     def choose_image(self):
-        img_path = tk.filedialog.askopenfilename(title="Select an Image", filetypes=[("Image files", "*.png;*.jpg;*.jpeg")])
+        img_path = tk.filedialog.askopenfilename(title="Select an Image")
 
         if img_path:
             import cv2
