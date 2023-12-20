@@ -4,11 +4,8 @@ import tkinter.filedialog
 import cv2
 from PIL import Image, ImageTk
 
-import os
-import ctypes
 from jigsaw.pieces_detection import extract_pieces
 from jigsaw.solving import solve_on_contours
-import psutil
 
 from grid_puzzle.greedy_solver import GreedySolver
 from grid_puzzle.grid import Grid
@@ -218,12 +215,10 @@ class MainWindow(tk.Frame):
 
         if img_path:
             import cv2
-            print(cv2.__version__)
             self.img_path_label.config(text='Path: ' + img_path)
             from UI.color_selector import ColorSelector
             color_selector = ColorSelector(self, img_path)
             color_selector.show_color_selector()
-            print("Color selector window closed")
 
             # Access the selected color after the window is closed
             if color_selector.color_selected:
@@ -243,18 +238,9 @@ class MainWindow(tk.Frame):
         if not self.conditions_met:
             print("Conditions not met. Cannot process.")
             return
-        # Dynamically increase the memory limit (Windows-specific)
-        ctypes.windll.kernel32.SetProcessWorkingSetSize(-1, -1)
         img_path = self.img_path_label.cget("text").split(": ")[1]
-        print(img_path)
         img = cv2.imread(img_path)
         bgr_selected_color = self.selected_color
-        # Get the current process ID
-        pid = os.getpid()
-        py = psutil.Process(pid)
-        # Get memory usage
-        memory_info = py.memory_info()
-        print(f"Memory used: {memory_info.rss / 1024 / 1024:.2f} MB")
         left_up_piece, right_up_piece, left_down_piece, right_down_piece,center_up_pieces, center_down_pieces, center_left_pieces, center_right_pieces, center_pieces,w,h = extract_pieces(img, bgr_selected_color)
         total_pieces_count = 4 + len(center_up_pieces) + len(center_down_pieces) + len(center_left_pieces) + len(center_right_pieces) + len(center_pieces)
         self.pieces_len.config(text='Image processing complete. Pieces detected : ' + str(total_pieces_count))
