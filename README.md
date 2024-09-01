@@ -14,7 +14,7 @@ Some types have several solving algorithms, they differ in implementation and so
 `python ./main.py`
 
 ## Screenshots
-[](screenshots/screenshot-1.png)
+![](./screenshots/screenshot-1.png)
 
 ## License
 [GPL-3-or-later](LICENSE)
