@@ -12,9 +12,7 @@ from grid_puzzle.hint_quant_solver import HintQuantSolver
 from grid_puzzle.hint_solver import HintSolver
 from jigsaw.jigsaw import Jigsaw
 from jigsaw.pieces_detection import extract_pieces
-from jigsaw.solving import solve_on_contours
 from utils import img_utils
-from jigsaw.solving import make_solution_array
 
 
 class MainWindow(tk.Frame):
